@@ -50,6 +50,40 @@ Explicit list of coverage gaps with reason and tracking ticket. Write `None.` if
 - This file is committed **before** any implementation file. The `check-tests-first.sh` validator enforces git history order.
 - Test file paths at this stage may be placeholders — they will be created during 05.3. The validator checks they exist *after* 05.3.
 
+## Example output
+
+Assume `plan.md` declares three stories: US-014 (sign-in), US-015 (task list sync), US-016 (push notifications). US-014 and US-015 are in scope on this branch; US-016 is deferred — no APNs sandbox yet — and tracked in BAJ-4210. Both in-scope stories add a pure function under `src/domain/`. The branch implements one new endpoint.
+
+```markdown
+---
+id: TESTS-001
+jira: BAJ-4117
+created: 2026-05-08
+version: 1
+---
+
+# Tests Plan — Sign-in and task sync
+
+## E2E coverage
+
+- US-014 → `e2e/US-014-sign-in.e2e.yaml`
+- US-015 → `e2e/US-015-task-sync.e2e.yaml`
+- US-016 → out-of-scope (no APNs sandbox on this branch, tracked in BAJ-4210)
+
+## Unit coverage
+
+- US-014 → `src/domain/auth/validateCredentials.ts` ↔ `src/domain/auth/validateCredentials.test.ts`
+- US-015 → `src/domain/sync/mergeTaskList.ts` ↔ `src/domain/sync/mergeTaskList.test.ts`
+
+## Contract coverage
+
+- `04-architecture/api-contracts.md#api-07-post-sessions` ↔ `tests/contracts/postSessions.contract.test.ts`
+
+## Out-of-scope
+
+- US-016 (push notifications) — requires APNs sandbox setup, tracked in BAJ-4210
+```
+
 ## Validate
 
 ```bash

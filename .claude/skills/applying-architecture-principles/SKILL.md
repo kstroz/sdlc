@@ -57,6 +57,17 @@ KISS-rule-2 violation in src/pricing/PricingStrategyFactory.ts:1
 Facade violation in src/checkout/index.ts:3
   Re-exports CartRepo and PricingService. Move back to internal;
   route callers through checkout() only.
+
+KISS-rule-3 violation in src/config/featureFlags.ts:14
+  enableExperimentalFeatures flag is false at every call site. Delete the knob.
+
+SOLID-O violation in src/notifications/dispatch.ts:42
+  switch on NotificationKind grows with each new channel. Add a new
+  channel module and dispatch via a registry instead.
+
+SOLID-I violation in src/reports/monthly.ts:7
+  Imports 12 methods from DbClient but only calls query and count.
+  Define a 2-method ReportQueries interface and depend on that.
 ```
 
 ## ADR amendment trigger

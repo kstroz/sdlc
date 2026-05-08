@@ -100,6 +100,136 @@ git commit -m "chore(bootstrap): scaffold app from tech-stack.md"
 
 The bootstrap commit is the baseline that the impl-loop will write on top of.
 
+## Concrete recipes
+
+The generic procedure above maps to one of three stack-specific recipes. Pick the one that matches `tech-stack.md` and run it verbatim. Each recipe ends in a green `test`/`lint`/`typecheck` baseline.
+
+### React Native + Expo (managed workflow)
+
+This is the recipe used in this repo for BAJ-100. Run from the repo root:
+
+```bash
+npx --yes create-expo-app@latest app --template default --no-install
+cd app && npm install
+mkdir -p src/domain src/use-cases src/platform
+touch src/domain/.gitkeep src/use-cases/.gitkeep src/platform/.gitkeep
+npm install --save-dev jest@^29.7.0 jest-expo@~54.0.0 ts-jest@^29.2.5 @types/jest@^29.5.14
+```
+
+Then edit `app/package.json` to add the `test` and `typecheck` scripts and a top-level `jest` config block:
+
+```json
+{
+  "scripts": {
+    "test": "jest --ci --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": ["<rootDir>/src/**/*.test.ts", "<rootDir>/src/**/*.test.tsx"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-clone-referenced-element|@react-navigation/.*|@unimodules/.*|@sentry/.*))"
+    ]
+  }
+}
+```
+
+Add a sanity test at `app/src/domain/__sanity__/sanity.test.ts`:
+
+```ts
+describe('sanity', () => {
+  it('arithmetic works', () => {
+    expect(1 + 1).toBe(2);
+  });
+});
+```
+
+Verify:
+
+```bash
+cd app && npm test && npm run typecheck && npm run lint
+```
+
+Does NOT include: WatermelonDB / Realm / SQLite, Sentry, navigation state libraries, or auth SDKs. Those are installed by the first task that touches them, with an ADR amendment if they cross a layer.
+
+### Flutter
+
+Run from the repo root:
+
+```bash
+flutter create app --platforms=ios,android
+cd app
+mkdir -p lib/domain lib/use_cases lib/platform
+touch lib/domain/.gitkeep lib/use_cases/.gitkeep lib/platform/.gitkeep
+```
+
+`flutter create` already wires `flutter test` and `flutter analyze` against `package:flutter_test` and `analysis_options.yaml`. Add a sanity test at `app/test/domain/sanity_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('arithmetic works', () {
+    expect(1 + 1, 2);
+  });
+}
+```
+
+Verify:
+
+```bash
+cd app && flutter test && flutter analyze
+```
+
+Does NOT include: drift / sqflite / isar persistence, riverpod or bloc state management, firebase or sentry SDKs. Add via ADR amendment when first needed.
+
+### Vite + React (web-only)
+
+Run from the repo root:
+
+```bash
+npm create vite@latest app -- --template react-ts
+cd app && npm install
+mkdir -p src/domain src/use-cases src/platform
+touch src/domain/.gitkeep src/use-cases/.gitkeep src/platform/.gitkeep
+npm install --save-dev vitest @vitest/coverage-v8 jsdom @testing-library/react
+```
+
+Edit `app/package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit"
+  }
+}
+```
+
+Add `test` config to `vite.config.ts` (`test: { environment: 'jsdom', globals: true }`) and a sanity test at `app/src/domain/__sanity__/sanity.test.ts`:
+
+```ts
+import { describe, it, expect } from 'vitest';
+
+describe('sanity', () => {
+  it('arithmetic works', () => {
+    expect(1 + 1).toBe(2);
+  });
+});
+```
+
+Verify:
+
+```bash
+cd app && npm test && npm run lint && npm run typecheck
+```
+
+Does NOT include: a router (react-router / tanstack-router), state manager, data-fetching client, or styling system. Each is added by the first task that requires it, with an ADR amendment if it crosses a layer.
+
 ## Validate
 
 After bootstrap, all three commands must exit 0 from the project root:
