@@ -5,7 +5,7 @@ Rules applied across every stage. Skills consume these in addition to their stag
 ## Files
 
 - `writing-style.md` — tone, language (English), terseness, banned phrases.
-- `cross-references.md` — ID prefixes (`I-NN`, `P-NN`, `JTBD-NN`, `J-NN`, `FR-NNN`, `NFR-NNN`, `S-NN`, `ADR-NNN`) and the anchor format for cross-stage links.
+- `cross-references.md` — ID prefixes (`I-NN`, `P-NN`, `E-NN`, `US-NNN`, `S-NN`, `ADR-NNN`) and the anchor format for cross-stage links.
 - `traceability.md` — required upstream links per artifact type. Enforced by `pipeline/validators/check-traceability.sh`.
 - `markdown-rules.md` — frontmatter requirements, heading hierarchy, code-block style, bullet character, no inline HTML.
 

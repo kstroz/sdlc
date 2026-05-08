@@ -4,7 +4,7 @@ Defines the structure of `04-architecture/data-model.md`. Skills generating this
 
 ## Required structure
 
-`data-model.md` opens with frontmatter, then one entry per entity. Entity order follows the order entities are introduced by user journeys.
+`data-model.md` opens with frontmatter, then one entry per entity. Entity order follows the order entities are introduced by user stories.
 
 ```markdown
 ---
@@ -16,9 +16,9 @@ version: 1
 # Data model
 
 ## <EntityName>
-- **Glossary**: [<Term>](../02-spec/glossary.md#<term-anchor>)
+- **Glossary**: [<Term>](../../../PRODUCT.md#<term-anchor>)
 - **Purpose**: <One sentence. WHY the entity exists in the system.>
-- **Source journey**: J-NN step <N> — <short reason this journey introduces the entity>
+- **Source story**: US-NNN — <short reason this story introduces the entity>
 - **Fields**:
   | Name | Type | Constraints | Nullable |
   |---|---|---|---|
@@ -37,8 +37,8 @@ Entity names use PascalCase and MUST match the casing of the glossary term they 
 
 The validator FAILS the gate if any entity:
 
-1. **Glossary link missing** — every entity must link to a glossary entry via `[<Term>](.../glossary.md#...)`.
-2. **Source journey missing** — every entity must reference a `J-NN` ID. Entities without a journey are speculative and must be cut.
+1. **Glossary link missing** — every entity must link to a glossary entry via `[<Term>](../../../PRODUCT.md#...)`.
+2. **Source story missing** — every entity must reference a `US-NNN` ID. Entities without a story are speculative and must be cut.
 3. **Fields table missing** or fewer than 1 field row beyond the header. An entity with no fields is not an entity.
 4. **Relationships** section absent. Use the literal `None` when the entity is standalone.
 5. **Cardinality missing** on any relationship line — `one-to-many` alone is not enough; specify `1..N` or `0..N` and the owning side.
@@ -46,7 +46,7 @@ The validator FAILS the gate if any entity:
 
 ## Why
 
-- **Glossary link** prevents shadow vocabulary. If the entity is not in the glossary, either the glossary is incomplete or the entity is invented — both block the gate.
-- **Source journey** kills CRUD-by-default modelling. Every entity earns its place by appearing in a real user step.
+- **Glossary link** prevents shadow vocabulary. If the entity is not in PRODUCT.md Glossary, either the glossary is incomplete or the entity is invented — both block the gate.
+- **Source story** kills CRUD-by-default modelling. Every entity earns its place by appearing in a real user story.
 - **Cardinality required** stops the silent drift between "loose link" and "join table" that costs a migration later.
 - **Lifecycle** forces the team to think about deletion before the schema is frozen — GDPR and account-deletion paths depend on it.

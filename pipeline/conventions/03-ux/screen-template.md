@@ -9,10 +9,10 @@ Defines the required structure of one screen entry inside `03-ux/screens.md`. Ev
 
 - **Role**: <one sentence describing the user-facing purpose. No solution language,
   no implementation detail. Example: "Lets a parent pick a bedtime track for the child.">
-- **Source journey steps**: <comma-separated list of journey-step IDs from stage 02,
-  e.g. J-01.2, J-03.1. At least one is required — a screen with no journey link is dead UI.>
+- **Source stories**: <comma-separated list of user story IDs from prd.md,
+  e.g. US-003, US-007. At least one is required — a screen with no story link is dead UI.>
 - **Components**: <bullet list of named components with one-line responsibility each.
-  No styling, no layout, no design language. Names must come from `02-spec/glossary.md`
+  No styling, no layout, no design language. Names must come from `PRODUCT.md` Glossary
   when a domain term exists. Example: "TrackList — renders the album's tracks in order.">
   - ...
   - ...
@@ -31,15 +31,15 @@ Repeat the block per screen. Order screens by `S-NN` ascending.
 The validator FAILS the gate if:
 
 1. Any screen heading omits the `S-NN —` prefix or duplicates an ID.
-2. Any screen lacks the bold-keyed lines `Role`, `Source journey steps`, `Components`, `Required states`, `Navigation`.
-3. `Source journey steps` is empty or contains no `J-NN` reference.
+2. Any screen lacks the bold-keyed lines `Role`, `Source stories`, `Components`, `Required states`, `Navigation`.
+3. `Source stories` is empty or contains no `US-NNN` reference.
 4. `Components` has fewer than 1 bullet item.
 5. `Navigation` is missing either `Entry points` or `Exit points`.
 6. A `S-NN` referenced in `ux-flows.md` does not exist in `screens.md`.
 
 ## Why these rules
 
-- **Journey-step traceability** — a screen that no journey step needs is either premature scope or a sign that stage 02 is incomplete. The pipeline rejects it either way.
+- **Story traceability** — a screen that no user story needs is either premature scope or a sign that stage 02 is incomplete. The pipeline rejects it either way.
 - **Components without styling** — stage 03 is product UX, not visual design. Mixing layout decisions in here makes screens.md churn every time the designer iterates.
-- **Glossary-driven naming** — `Posiłki` not `MealsScreen`, `Bajka` not `StoryEntity`. The user-facing name in screens.md is the same name the user sees in the app, so QA scripts and journeys stay readable.
+- **Glossary-driven naming** — names come from `PRODUCT.md` Glossary so the user-facing name in screens.md matches what the user sees in the app, keeping QA scripts readable.
 - **Explicit navigation lists** — every entry/exit must be enumerated. "Standard back" is not a navigation contract; either it returns to a specific `S-NN` or it terminates the flow.
