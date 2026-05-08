@@ -52,15 +52,13 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        # project: replace with: yarn install --frozen-lockfile
-        run: |
-          echo "project: replace with: yarn install --frozen-lockfile"
+        working-directory: ./app
+        run: npm ci
 
       - name: Lint
         id: lint
-        run: |
-          # project: replace with: yarn lint --format unix | tee lint.out
-          echo "project: replace with: yarn lint" | tee lint.out
+        working-directory: ./app
+        run: npm run lint 2>&1 | tee ../lint.out
 
       - name: Upload lint output
         if: always()
@@ -71,9 +69,8 @@ jobs:
 
       - name: Typecheck
         id: typecheck
-        run: |
-          # project: replace with: yarn tsc --noEmit | tee typecheck.out
-          echo "project: replace with: yarn tsc --noEmit" | tee typecheck.out
+        working-directory: ./app
+        run: npm run typecheck 2>&1 | tee ../typecheck.out
 
       - name: Upload typecheck output
         if: always()
@@ -98,9 +95,8 @@ jobs:
 
       - name: Unit tests
         id: unit-tests
-        run: |
-          # project: replace with: yarn test --ci --reporters=default --reporters=jest-junit | tee unit-tests.out
-          echo "project: replace with: yarn test --ci" | tee unit-tests.out
+        working-directory: ./app
+        run: npm test -- --ci 2>&1 | tee ../unit-tests.out
 
       - name: Upload unit-tests output
         if: always()
@@ -126,11 +122,8 @@ jobs:
 
       - name: Dependency audit
         id: dependency-audit
-        run: |
-          # project: replace with the audit tool for your stack.
-          # Node default below. Swift: `swift package audit` (when available) or third-party.
-          # Python: `pip-audit`. Java: `gradle dependencyCheckAnalyze`.
-          npm audit --audit-level=high | tee dependency-audit.out || true
+        working-directory: ./app
+        run: npm audit --audit-level=high 2>&1 | tee ../dependency-audit.out || true
 
       - name: Upload dependency-audit output
         if: always()

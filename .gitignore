@@ -1,1 +1,23 @@
+# Crash dumps from MSYS2 grep on Windows
 *.stackdump
+
+# Ralph loop runtime state — must not be committed
+.claude/ralph-loop.local.md
+
+# Stage 05 progress checkpoint — runtime state for the impl loop
+.claude/PROGRESS.md
+
+# Node / app runtime
+node_modules/
+.expo/
+dist/
+build/
+*.log
+app/node_modules/
+app/.expo/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
