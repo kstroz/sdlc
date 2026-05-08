@@ -29,7 +29,7 @@ No global Claude Code plugins are required — the ralph-loop stop hook, agents,
    ```bash
    bash pipeline/bin/init-project.sh BAJ-123 my-feature
    ```
-3. **Drop your raw input** (brief, transcripts) into `.pipeline/01-idea/_inputs/`.
+3. **Drop your raw input** (brief, transcripts) into `.pipeline/01-idea/_inputs/`. Optionally also drop `_inputs/stack-preferences.md` (see `pipeline/conventions/01-idea/stack-preferences-template.md`) if you have an opinion on the tech stack before architecture is decided.
 4. **Open Claude Code** in the project root and walk the stages:
    ```
    /generate-product           # PRODUCT.md (one-time per product)
@@ -40,6 +40,17 @@ No global Claude Code plugins are required — the ralph-loop stop hook, agents,
    /stage-05                   # see below
    ```
 5. **For each stage**, the matching validator must exit 0 before the gate. The slash command runs the validator at the end and reports failures.
+
+### Where do I say "this is a mobile app, not a web app"?
+
+In `idea.md` (Stage 01) `## Platforms` section. The agent fills it from the brief if the brief is explicit; if the brief is ambiguous about whether you want mobile, web, backend, or some combination, the agent pauses via the `requesting-customer-input` skill and asks you before continuing. The Platforms section captures WHAT — mobile-ios, mobile-android, mobile-cross-platform, web, desktop, backend, cli — each marked `yes` / `no` / `existing` / `deferred`.
+
+### Where do I say "I want React Native, not Flutter"?
+
+Two places, in this order of strength:
+
+- `_inputs/stack-preferences.md` (optional, lives next to the brief). If you have a hard preference — license, hiring, prior commitment — record it here with an `override allowed: no` flag and the architect must use it. See `pipeline/conventions/01-idea/stack-preferences-template.md`.
+- Stage 04 `tech-stack.md` (always). The architect chooses per layer (Mobile / Backend / Data / Infra / Observability) with a trade-off matrix vs the NFRs and one ADR per non-trivial choice. If `_inputs/stack-preferences.md` exists with `override allowed: yes`, the architect treats it as the first alternative; if `override allowed: no`, the architect uses it unless the NFRs make it impossible (in which case the architect escalates back to the user via `requesting-customer-input`).
 
 ## Stage 05 — autonomous development
 
