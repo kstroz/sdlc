@@ -65,15 +65,15 @@ while IFS= read -r sid; do
   done
 done <<< "$screen_ids"
 
-# 3. Each flow in ux-flows.md must reference at least one journey ID.
+# 3. Each flow in ux-flows.md must reference at least one story ID.
 flow_headings=$(grep -nE '^## F-[0-9]+' "$FLOWS" || true)
 if [[ -z "$flow_headings" ]]; then
   errors+=("ux-flows.md: no '## F-NN' flow headings found")
 else
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    if ! echo "$line" | grep -qE 'journey:[[:space:]]*J-[0-9]+'; then
-      errors+=("ux-flows.md: flow heading missing '(journey: J-NN)' — $line")
+    if ! echo "$line" | grep -qE 'story:[[:space:]]*US-[0-9]+'; then
+      errors+=("ux-flows.md: flow heading missing '(story: US-NNN)' — $line")
     fi
   done <<< "$flow_headings"
 fi
