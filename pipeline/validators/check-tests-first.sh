@@ -59,9 +59,10 @@ for task_file in "$TASKS_DIR"/T-*.md; do
   ' "$task_file" | tr -d '[:space:]')
   [[ "$status" != "done" ]] && continue
 
-  # Extract files touched: bullets under "## Files touched" with `path` in backticks.
+  # Extract files touched AND test plan paths — both sections may name files in backticks.
   files=$(awk '
     /^## Files touched$/ {flag=1; next}
+    /^## Test plan$/     {flag=1; next}
     /^## /               {flag=0}
     flag
   ' "$task_file" | grep -oE '`[^`]+`' | tr -d '`')

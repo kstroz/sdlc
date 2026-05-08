@@ -48,7 +48,7 @@ export class EPrzegladyForwarder {
     if (result.ok) {
       return { kind: 'ack' };
     }
-    if (item.attempts >= this.maxAttempts) {
+    if (item.attempts > this.maxAttempts) {
       await this.alerter.alert(
         `ePrzeglądy forwarding failed permanently for task ${item.payload.taskId} after ${item.attempts} attempts (last status ${result.status})`,
       );

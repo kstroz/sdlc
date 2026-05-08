@@ -47,7 +47,7 @@ describe('contract: POST /tasks/{id}/complete', () => {
       attemptCount: 0,
       lastAttemptAt: null,
       lastError: null,
-      createdAt: '2026-05-08T08:30:00.000Z',
+      createdAt: new Date('2026-05-08T08:30:00.000Z'),
     };
 
     const sync = createSyncClient({
