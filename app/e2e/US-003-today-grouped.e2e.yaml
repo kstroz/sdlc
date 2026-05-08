@@ -1,0 +1,24 @@
+# US-003: Today screen groups tasks by building with correct counts.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  # Pre-populate the local cache via test bridge before launch.
+  # 5 tasks across 3 buildings: Building A x2, Building B x2, Building C x1.
+  - testBridge:
+      action: "seedCache"
+      payload:
+        tasks:
+          - { id: "t1", buildingId: "b-a", buildingName: "Building A", title: "Replace filter" }
+          - { id: "t2", buildingId: "b-a", buildingName: "Building A", title: "Inspect roof" }
+          - { id: "t3", buildingId: "b-b", buildingName: "Building B", title: "Fix leak" }
+          - { id: "t4", buildingId: "b-b", buildingName: "Building B", title: "Repaint door" }
+          - { id: "t5", buildingId: "b-c", buildingName: "Building C", title: "Replace bulb" }
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  - assertVisible: "Building A"
+  - assertVisible: "Building B"
+  - assertVisible: "Building C"
+  - assertVisible: { id: "group-b-a-count", text: "2" }
+  - assertVisible: { id: "group-b-b-count", text: "2" }
+  - assertVisible: { id: "group-b-c-count", text: "1" }

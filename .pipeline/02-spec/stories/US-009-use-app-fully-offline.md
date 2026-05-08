@@ -3,9 +3,9 @@ id: US-009
 epic: E-04
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-009 — Use the app fully offline

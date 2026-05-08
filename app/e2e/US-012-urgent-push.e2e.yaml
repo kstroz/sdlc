@@ -1,0 +1,33 @@
+# US-012: Urgent task push notification routes into the task detail.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  # Send the app to the background.
+  - pressHome
+  # Backend assigns a new urgent task; push is dispatched via the test bridge.
+  - testBridge:
+      action: "assignUrgentTask"
+      payload:
+        task:
+          id: "t-urgent-1"
+          buildingId: "b-a"
+          buildingName: "Building A"
+          title: "URGENT: Burst pipe in lobby"
+          priority: "urgent"
+  - waitFor:
+      timeoutSeconds: 60
+      condition:
+        testBridge:
+          action: "pushNotificationReceived"
+          payload: { taskId: "t-urgent-1" }
+  - assertNotificationVisible:
+      title: "URGENT: Burst pipe in lobby"
+  - tapOnNotification:
+      taskId: "t-urgent-1"
+  - assertVisible: "URGENT: Burst pipe in lobby"
+  - assertVisible: { id: "task-detail-screen" }
+  - testBridge:
+      action: "assertCurrentRoute"
+      payload: { route: "/task/t-urgent-1" }

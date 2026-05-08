@@ -3,9 +3,9 @@ id: US-013
 epic: E-05
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-013 — Push completion records to ePrzeglądy

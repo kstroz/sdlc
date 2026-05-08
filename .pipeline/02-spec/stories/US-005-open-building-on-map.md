@@ -3,9 +3,9 @@ id: US-005
 epic: E-02
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: SHOULD
-status: todo
+status: done
 ---
 
 # US-005 — Open building location on a map

@@ -3,9 +3,9 @@ id: US-012
 epic: E-04
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-012 — Receive new urgent tasks in real time

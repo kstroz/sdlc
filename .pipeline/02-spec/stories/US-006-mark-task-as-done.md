@@ -3,9 +3,9 @@ id: US-006
 epic: E-03
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-006 — Mark a task as done

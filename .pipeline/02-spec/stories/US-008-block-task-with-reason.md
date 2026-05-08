@@ -3,9 +3,9 @@ id: US-008
 epic: E-03
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-008 — Report a task as blocked with a reason

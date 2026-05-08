@@ -1,0 +1,21 @@
+# US-008: Mark a task as blocked with a reason.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "seedCache"
+      payload:
+        tasks:
+          - { id: "t-block-1", buildingId: "b-a", buildingName: "Building A", title: "Repair pump" }
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  - tapOn: "Repair pump"
+  - tapOn: "Cannot complete"
+  - assertVisible: "Why can't this be completed?"
+  - tapOn: "Needs parts"
+  - tapOn: "Confirm"
+  - assertVisible: "Blocked"
+  - testBridge:
+      action: "assertTaskState"
+      payload: { taskId: "t-block-1", status: "blocked", reason: "needs_parts" }

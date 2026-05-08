@@ -1,0 +1,36 @@
+# US-010: Queued OutboxActions drain once the network comes back.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "setNetwork"
+      payload: { online: false }
+  - testBridge:
+      action: "seedOutbox"
+      payload:
+        actions:
+          - { id: "o1", type: "TASK_COMPLETE", taskId: "t-1", status: "queued" }
+          - { id: "o2", type: "TASK_COMPLETE", taskId: "t-2", status: "queued" }
+          - { id: "o3", type: "TASK_BLOCK",    taskId: "t-3", reason: "needs_parts", status: "queued" }
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  - testBridge:
+      action: "assertOutboxSize"
+      payload: { size: 3 }
+  # Bring the network back; sync runs in the background.
+  - testBridge:
+      action: "setNetwork"
+      payload: { online: true }
+  - waitFor:
+      timeoutSeconds: 60
+      condition:
+        testBridge:
+          action: "outboxSize"
+          equals: 0
+  - testBridge:
+      action: "assertOutboxSize"
+      payload: { size: 0 }
+  - testBridge:
+      action: "assertActionsAcked"
+      payload: { ids: ["o1", "o2", "o3"] }

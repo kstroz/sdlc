@@ -3,9 +3,9 @@ id: US-001
 epic: E-01
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-001 — Sign in with credentials

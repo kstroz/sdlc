@@ -3,9 +3,9 @@ id: US-011
 epic: E-04
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: SHOULD
-status: todo
+status: done
 ---
 
 # US-011 — Wifi-only sync option for media

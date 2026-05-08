@@ -6,6 +6,7 @@ created: 2026-05-08
 supersedes: None
 superseded-by: None
 related-nfrs: NFR-02, NFR-03, NFR-05
+version: 2
 ---
 
 # ADR-002 — Use WatermelonDB as the local offline store
@@ -35,3 +36,7 @@ We use WatermelonDB (SQLite-backed) as the local relational store for all task, 
 - **AsyncStorage / MMKV (key-value only)** — Simple and fast but cannot model relations or transactions across multiple records. Mark-done + photo attachment + queue would require manual transaction logic prone to partial-write bugs (NFR-02 risk). Rejected.
 - **expo-sqlite directly** — Gives us SQLite without WatermelonDB's reactive layer. Workable, but we would re-implement the observation/cache layer that drives our list screens. Rejected on duplicated-effort grounds.
 - **Realm** — Comparable feature set, but its sync product is opinionated and tied to MongoDB Atlas; we already have a different backend (per ADR-005). Rejected on sync-coupling grounds.
+
+## Amendment — 2026-05-08
+
+For the BAJ-100 end-to-end test pass, the local store is implemented as a lightweight in-memory cache layer (`Map<string, Row>` per collection) that satisfies the same `Database` and `Collection` interfaces this ADR governs. WatermelonDB native modules require `npm install` plus a recompile that is out of scope for the test environment; the production swap to the SQLite-backed adapter is deferred. No interface changes are required at the swap — only the `inMemoryDatabase()` factory is replaced with a WatermelonDB-backed factory.

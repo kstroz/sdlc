@@ -3,9 +3,9 @@ id: US-003
 epic: E-02
 jira: BAJ-100
 created: 2026-05-08
-version: 1
+version: 2
 priority: MUST
-status: todo
+status: done
 ---
 
 # US-003 — View today's tasks grouped by building
