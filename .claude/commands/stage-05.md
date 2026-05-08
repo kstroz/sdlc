@@ -14,6 +14,14 @@ If stage 02 or 04 artifacts are missing, tell the user to run the earlier stages
 
 ---
 
+## Sub-stage 05.0 — Project bootstrap (run once per branch)
+
+Apply skill `bootstrapping-project` once before generating the plan. It scaffolds an `app/` directory from the chosen tech stack, wires test/lint/typecheck commands, and produces a green baseline so the impl-loop has somewhere to write code.
+
+If `app/` already exists with a passing `npm test && npm run lint && npm run typecheck`, skip this sub-stage.
+
+---
+
 ## Sub-stage 05.1 — Plan
 
 Apply skill `breaking-down-feature-into-tasks`.

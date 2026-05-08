@@ -23,7 +23,8 @@ errors=()
 
 # Resolve sibling paths: <branch>/.pipeline/05-dev/  →  <branch>/.pipeline/02-spec/
 PIPELINE_ROOT=$(cd "$DIR/.." 2>/dev/null && pwd)
-JOURNEYS="$PIPELINE_ROOT/02-spec/user-journeys.md"
+STORIES_DIR="$PIPELINE_ROOT/02-spec/stories"
+PLAN="$DIR/plan.md"
 TESTS_PLAN="$DIR/tests-plan.md"
 QUALITY_DIR="$DIR/quality-reports"
 CHANGELOG="$DIR/changelog.md"
@@ -81,14 +82,19 @@ fi
 # 4. Coverage mapping — delegate to check-coverage-mapping.sh if available.
 CM="$SCRIPT_DIR/check-coverage-mapping.sh"
 if [[ -x "$CM" ]]; then
-  if [[ -f "$TESTS_PLAN" && -f "$JOURNEYS" ]]; then
-    if ! "$CM" "$TESTS_PLAN" "$JOURNEYS" >/dev/null 2>&1; then
+  if [[ -f "$TESTS_PLAN" && -f "$PLAN" ]]; then
+    if ! "$CM" "$TESTS_PLAN" "$PLAN" >/dev/null 2>&1; then
       errors+=("coverage mapping: check-coverage-mapping.sh failed")
     fi
   else
     [[ -f "$TESTS_PLAN" ]] || errors+=("tests-plan.md missing")
-    [[ -f "$JOURNEYS" ]]   || errors+=("user-journeys.md missing at $JOURNEYS")
+    [[ -f "$PLAN" ]]       || errors+=("plan.md missing at $PLAN")
   fi
+fi
+
+# 5. Stories directory must exist (sanity).
+if [[ ! -d "$STORIES_DIR" ]]; then
+  errors+=("02-spec/stories/ missing — Stage 02 not run")
 fi
 
 if (( ${#errors[@]} == 0 )); then

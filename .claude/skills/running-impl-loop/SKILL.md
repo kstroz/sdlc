@@ -31,7 +31,7 @@ If `.claude/PROGRESS.md` does not exist:
 # Stage 05 Progress
 
 ## Current phase
-05.2-tests-plan
+05.0-bootstrap
 
 ## Tasks
 <!-- populated from plan.md after 05.1 approval -->
@@ -51,6 +51,13 @@ Then read `.pipeline/05-dev/plan.md` and populate the `## Tasks` section with on
 **Prerequisite check**: if `_approval-plan.json` is missing, stop and tell the user that plan approval is required before the loop can start. Do not output the completion promise.
 
 ## Phase logic
+
+### Phase: `05.0-bootstrap`
+
+If `app/` does not exist or `cd app && npm test && npm run lint && npm run typecheck` does not all exit 0:
+- Apply skill `bootstrapping-project`
+- Verify the three commands pass before proceeding
+- Update `## Current phase` → `05.2-tests-plan`
 
 ### Phase: `05.2-tests-plan`
 
