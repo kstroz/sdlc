@@ -12,58 +12,53 @@ Read all files under `pipeline/conventions/05-dev/` before starting.
 
 If stage 02 or 04 artifacts are missing, tell the user to run the earlier stages first and stop.
 
-## Sub-stages — work through these in order
+---
 
-### 05.1 — Plan (`plan.md`)
+## Sub-stage 05.1 — Plan
 
-Generate `.pipeline/05-dev/plan.md` following `pipeline/conventions/05-dev/plan-template.md`.
+Apply skill `breaking-down-feature-into-tasks`.
 
-Break the PRD epics into an ordered implementation plan. Each plan item maps to one epic
-(E-NN) and lists: implementation order rationale, dependencies on other plan items,
-estimated complexity (S / M / L), and the stories (US-NNN) it delivers.
+This produces `.pipeline/05-dev/plan.md` and `.pipeline/05-dev/tasks/T-NNN.md` files.
+Validator: `bash pipeline/validators/check-plan.sh .pipeline/05-dev/plan.md`
 
-Run `pipeline/validators/check-plan.sh .pipeline/05-dev/plan.md`. Fix failures.
-**Stop here and present the plan for approval before continuing.**
-
-### 05.2 — Tests plan (`tests-plan.md`)
-
-Generate `.pipeline/05-dev/tests-plan.md` following `pipeline/conventions/05-dev/tests-plan-template.md`.
-
-Map every US-NNN story acceptance criteria to a test case. For each test case: type
-(unit | integration | e2e), the story it covers, the Given/when/then scenario, and
-the file path where the test will live (can be a placeholder path at this stage).
-
-Run `pipeline/validators/check-tests-first.sh .pipeline/05-dev .` once test files exist.
-
-### 05.3 — Implementation loop
-
-For each plan item, in order:
-1. Read `pipeline/conventions/05-dev/architecture-principles.md` (KISS, SOLID, Facade).
-2. Read `pipeline/conventions/05-dev/pure-function-policy.md`.
-3. Implement the stories. Write tests before or alongside implementation code.
-4. After each item, run `pipeline/validators/check-quality-thresholds.sh .pipeline/05-dev/quality-reports`.
-
-### 05.4 — Quality gate
-
-Run the quality checks from `pipeline/conventions/05-dev/quality-gate-criteria.md`:
-- Modularity review (`reviewing-modularity`)
-- UI/logic separation review (`reviewing-ui-logic-separation`)
-- Edge case discovery (`discovering-edge-cases`) using `pipeline/conventions/05-dev/edge-case-categories.md`
-- Dead-end detection (`detecting-user-dead-ends`)
-
-Write reports to `.pipeline/05-dev/quality-reports/`.
-
-### 05.5 — Changelog
-
-Generate a changelog entry following `pipeline/conventions/05-dev/changelog-format.md`.
-Update or create `CHANGELOG.md` at the repo root.
-
-## After all sub-stages
-
-Run:
-
-```bash
-bash pipeline/validators/check-merge-readiness.sh .pipeline/05-dev
+**Gate: stop here and present the plan for user approval before continuing.**
+Once approved, commit `_approval-plan.json`:
+```json
+{ "decision": "approved", "approver": "<name>", "date": "<YYYY-MM-DD>" }
 ```
 
-Fix every failure. Present the summary to the user for merge approval.
+---
+
+## Sub-stages 05.2–05.8 — Autonomous implementation loop
+
+After plan approval, start the autonomous loop:
+
+```
+/ralph-loop "Apply skill: running-impl-loop" --completion-promise "MERGE-READY" --max-iterations 50
+```
+
+The loop handles sub-stages in order:
+
+| Sub-stage | What happens |
+|---|---|
+| 05.2 Tests plan | `mapping-tests-to-stories` → `tests-plan.md` |
+| 05.3 Impl loop | Per task: TDD → implement → architecture check → pure function check |
+| 05.4 Quality gate | `reviewing-modularity`, `reviewing-ui-logic-separation`, `detecting-user-dead-ends`, `detecting-logic-gaps`, `discovering-edge-cases` |
+| 05.8 Changelog | `generating-changelog` → `changelog.md` → `check-merge-readiness.sh` |
+
+The loop outputs `<promise>MERGE-READY</promise>` only when `check-merge-readiness.sh` exits 0.
+
+Progress is tracked in `.claude/PROGRESS.md` — if a session ends mid-loop, restart with the same `/ralph-loop` command and it resumes from where it left off.
+
+To cancel the loop at any time: `/cancel-ralph`
+
+---
+
+## After merge-ready
+
+Run `/review-pr` for the human gate review before merge approval.
+
+Prerequisites for developers:
+- `bash` in PATH (Git Bash on Windows: https://git-scm.com)
+- `jq` installed (`brew install jq` / `choco install jq` / `apt install jq`)
+- `perl` installed (included with Git for Windows, macOS, most Linux distros)
