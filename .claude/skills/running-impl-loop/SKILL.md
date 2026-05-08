@@ -94,7 +94,15 @@ Run the four quality gate skills in order. After each one, check that the report
 4. Apply skill `detecting-logic-gaps` → `.pipeline/05-dev/quality-reports/logic-gaps.md`
 5. Apply skill `discovering-edge-cases` → appends to existing reports
 6. Check all four report boxes in PROGRESS.md
-7. Update `## Current phase` → `05.8-changelog`
+7. Update `## Current phase` → `05.6-security`
+
+### Phase: `05.6-security`
+
+Apply skill `security-reviewing-stage-05` → `.pipeline/05-dev/quality-reports/security-review.md`. Fix every FAIL line. Update `## Current phase` → `05.7-review`.
+
+### Phase: `05.7-review`
+
+Apply skill `coordinating-code-review`. It dispatches the relevant pr-review-toolkit agents in parallel and aggregates the findings into `.pipeline/05-dev/quality-reports/code-review.md`. Fix every FAIL line, then update `## Current phase` → `05.8-changelog`.
 
 ### Phase: `05.8-changelog`
 
