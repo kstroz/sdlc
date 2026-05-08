@@ -35,29 +35,42 @@ Tell the user the detected state in one short sentence, then proceed with that s
 
 ## Step 1 — Initialise the project
 
-Ask the user **two short questions** via `AskUserQuestion`:
+The wizard creates a branch named `feature/<TICKET>/<short-name>`. Ask only the **one** question that cannot be derived; auto-suggest the rest.
 
-### Q1 — Do you have a tracker ticket?
+### Q1 — Tracker ticket
 
-Header: "Tracker". Options:
-- **Yes — JIRA / Linear / GitHub issue / etc.** — User will paste the ID in the next message (e.g. `BAJ-100`, `LIN-42`, `GH-1234`). Free-form, the wizard does not parse it.
-- **No tracker — generate a local ID** — Wizard synthesises `LOCAL-<NNNN>` where `NNNN` is `001` for the first feature, or one higher than the highest existing `feature/LOCAL-XXXX/*` branch. Pure local convention; can be replaced later by editing the `jira:` frontmatter when the team adopts a tracker.
+Use `AskUserQuestion`. Header: "Tracker". Options:
+- **Yes — I have a tracker ID** — User will paste any ID (`BAJ-100`, `LIN-42`, `GH-1234`, etc.) in their next message. Free-form.
+- **No tracker — generate a local ID** — Wizard synthesises `LOCAL-<NNNN>` where `NNNN` is `001` on the first feature, or one higher than the highest existing `feature/LOCAL-XXXX/*` branch. Can be search-and-replaced later when the team adopts a tracker.
 
-### Q2 — Short slug for the branch
+If the user picks "Yes", read their ticket ID from the next message.
 
-Always ask. One- or two-word kebab-case description, e.g. `task-tracker`, `auth-rewrite`, `inspection-app`. The wizard sanitises (lowercase, replace spaces with hyphens, strip punctuation).
+### Auto-derive the branch short-name (no question)
 
-If the user picked "Yes" in Q1, ask them to paste the ticket ID in the next message before Q2 (or accept it inline if they already wrote it).
+Do not ask for a "slug" — that is jargon and the brief gives us the answer. After Step 2 captures the brief, generate the short-name from the brief's first sentence or title:
+
+1. Take the first non-empty line of the brief.
+2. Lowercase it.
+3. Strip punctuation.
+4. Collapse whitespace to single hyphens.
+5. Keep at most the first 3 words; trim trailing hyphens.
+
+Examples:
+- Brief opens with "A counter app where users tap +/-" → `counter-app`
+- Brief opens with "Field maintenance app for offline task execution" → `field-maintenance-app`
+- Brief opens with "Auth rewrite to support SSO" → `auth-rewrite`
+
+If the brief is too short or generic to produce a useful name, fall back to asking the user **one** question via `AskUserQuestion` with a one-line label "Branch short-name" and three to four suggested options derived from the brief plus an "Other" implicit. Never call it a slug.
 
 ### Run init
 
 ```bash
-bash pipeline/bin/init-project.sh <TICKET-ID> <slug>
+bash pipeline/bin/init-project.sh <TICKET-ID> <short-name>
 ```
 
-`<TICKET-ID>` is either the user-supplied tracker ID or the synthesised `LOCAL-NNNN`. The script switches to branch `feature/<TICKET-ID>/<slug>` and seeds `.pipeline/`. Confirm the branch is now active and re-run state detection (back to top).
+`<TICKET-ID>` is the user-supplied or synthesised value. `<short-name>` is the derived kebab-case description. The script switches to branch `feature/<TICKET-ID>/<short-name>` and seeds `.pipeline/`. Confirm the branch is now active and re-run state detection (back to top).
 
-Note: every artifact's `jira:` frontmatter will receive this value. Validators check that the field exists, not its format, so any non-empty string works. If the team later adopts a tracker, the value can be search-and-replaced across `.pipeline/` without breaking anything else.
+Validators check only that `jira:` frontmatter exists, not its format, so any non-empty string works for the ticket value.
 
 ## Step 2 — Capture the brief
 

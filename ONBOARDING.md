@@ -36,12 +36,12 @@ claude
 /start-flow
 ```
 
-The wizard does the rest. First two questions are about identity:
+The wizard asks only what it cannot derive:
 
 - **Tracker ticket?** Pick "Yes" and paste a JIRA / Linear / GitHub issue ID (any format), or pick "No" and the wizard synthesises a local `LOCAL-NNNN` ID. You can swap it for a real ticket later by editing the `jira:` frontmatter — validators only care that the field exists.
-- **Short slug for the branch.** One or two kebab-case words (e.g. `task-tracker`, `auth-rewrite`).
+- **Brief.** Paste 1–3 paragraphs, point at a file, or say "already in `_inputs/`". The wizard auto-derives the branch short-name from the brief's opening line (e.g. "Field maintenance app for offline task execution" → `field-maintenance-app`).
 
-Then the wizard prompts you to paste the brief, multi-selects which platforms you are building (iOS / Android / cross-platform mobile / web / backend / desktop / cli), and only asks per-platform tech questions for the platforms you picked (e.g. "iOS UI: SwiftUI or UIKit?", "Backend: Node, Python, Go, or let architect decide?"). It writes `_inputs/stack-preferences.md` and runs `/stage-01` for you.
+Then the wizard multi-selects which platforms you are building (iOS / Android / cross-platform mobile / web / backend / desktop / cli) and only asks per-platform tech questions for the platforms you picked (e.g. "iOS UI: SwiftUI or UIKit?", "Backend: Node, Python, Go, or let architect decide?"). It writes `_inputs/stack-preferences.md` and runs `/stage-01` for you.
 
 Re-run `/start-flow` after each stage and it advances to the next one — or call `/stage-XX` directly when you want fine-grained control.
 
