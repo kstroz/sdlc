@@ -76,8 +76,8 @@ fi
 # 4. data-model.md entities reference glossary.
 DM="$DIR/data-model.md"
 if [[ -f "$DM" ]]; then
-  if ! grep -qE '\[.*\]\(.*glossary\.md' "$DM"; then
-    errors+=("data-model.md: no entity references the glossary (expected '[term](.../glossary.md...)' link)")
+  if ! grep -qE '\[.*\]\(.*(glossary\.md|PRODUCT\.md)' "$DM"; then
+    errors+=("data-model.md: no entity references the glossary (expected '[term](.../glossary.md...)' or '[term](.../PRODUCT.md...)' link)")
   fi
 fi
 

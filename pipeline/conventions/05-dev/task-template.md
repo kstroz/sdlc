@@ -17,16 +17,13 @@ version: 1
 ## Status
 <one of: planned | in-progress | blocked | done>
 
-## Requirements
-- FR-NNN
-- FR-NNN
-
-## Journeys
-- J-NN (step N)
+## Stories
+- US-NNN
+- US-NNN
 
 ## Acceptance
-<Given/When/Then bullets, one per acceptance condition. Mirrors the FR
-acceptance criteria but scoped to this task.>
+<Given/When/Then bullets, one per acceptance condition. Mirrors the story
+acceptance criteria from `02-spec/stories/US-NNN-*.md` but scoped to this task.>
 
 - Given <precondition>, when <action>, then <observable result>.
 
@@ -35,7 +32,7 @@ acceptance criteria but scoped to this task.>
 At least one entry required. Use `tests-plan.md` IDs if applicable.>
 
 - Unit: `path/to/module.test.ts` — covers <function>
-- E2E: `path/to/journey.e2e.yaml` — covers J-NN step N
+- E2E: `path/to/story.e2e.yaml` — covers US-NNN
 
 ## Files touched
 - `path/to/file.ts` — <one-line reason>
@@ -56,12 +53,11 @@ The validator FAILS the gate if:
 
 1. **Frontmatter** missing or missing any of `id`, `jira`, `created`, `version`.
 2. **Status** value is not one of `planned`, `in-progress`, `blocked`, `done`.
-3. **Requirements** section absent or contains no `FR-NNN` reference.
-4. **Journeys** section absent or contains no `J-NN` reference.
-5. **Acceptance** section has fewer than one bullet, or any bullet missing `Given`, `when`, `then`.
-6. **Test plan** section is empty (zero bullets). At minimum one test must be named.
-7. **Files touched** section absent (literal `none — non-code task` allowed).
-8. **Definition of done** checklist missing one or more of the six required items above.
+3. **Stories** section absent or contains no `US-NNN` reference.
+4. **Acceptance** section has fewer than one bullet, or any bullet missing `Given`, `when`, `then`.
+5. **Test plan** section is empty (zero bullets). At minimum one test must be named.
+6. **Files touched** section absent (literal `none — non-code task` allowed).
+7. **Definition of done** checklist missing one or more of the six required items above.
 
 ## Why
 

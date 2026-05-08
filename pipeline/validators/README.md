@@ -13,7 +13,7 @@ Scripts that enforce the conventions in `pipeline/conventions/`. Each validator 
 | `check-traceability.sh` | the entire `<branch>/.pipeline/` tree | `conventions/_global/traceability.md` |
 | `check-plan.sh` | `<branch>/.pipeline/05-dev/plan.md` | `conventions/05-dev/plan-template.md` |
 | `check-tests-first.sh` | `<branch>/.pipeline/05-dev/` + repo git history | `conventions/05-dev/task-template.md` |
-| `check-coverage-mapping.sh` | `<branch>/.pipeline/05-dev/tests-plan.md` + `02-spec/user-journeys.md` | `conventions/05-dev/tests-plan-template.md` |
+| `check-coverage-mapping.sh` | `<branch>/.pipeline/05-dev/tests-plan.md` + `05-dev/plan.md` | `conventions/05-dev/tests-plan-template.md` |
 | `check-quality-thresholds.sh` | `<branch>/.pipeline/05-dev/quality-reports/` | `conventions/05-dev/{modularity-thresholds,edge-case-categories,quality-gate-criteria}.md` |
 | `check-merge-readiness.sh` | `<branch>/.pipeline/05-dev/` (directory) | `conventions/05-dev/quality-gate-criteria.md` |
 
@@ -27,7 +27,7 @@ Scripts that enforce the conventions in `pipeline/conventions/`. Each validator 
 ./check-traceability.sh        path/to/.pipeline
 ./check-plan.sh                path/to/.pipeline/05-dev/plan.md
 ./check-tests-first.sh         path/to/.pipeline/05-dev/  path/to/repo
-./check-coverage-mapping.sh    path/to/.pipeline/05-dev/tests-plan.md  path/to/.pipeline/02-spec/user-journeys.md
+./check-coverage-mapping.sh    path/to/.pipeline/05-dev/tests-plan.md  path/to/.pipeline/05-dev/plan.md
 ./check-quality-thresholds.sh  path/to/.pipeline/05-dev/quality-reports/
 ./check-merge-readiness.sh     path/to/.pipeline/05-dev/
 ```
