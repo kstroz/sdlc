@@ -1,0 +1,183 @@
+# Stage 05 (Development) — reference workflow.
+#
+# Runs the deterministic checks of the dev pipeline. Every step uploads its
+# output as an artifact so downstream consumers (e.g. the AI quality gate)
+# can read raw results without re-running the underlying tools.
+#
+# Intentionally NOT in this workflow:
+#   - The AI quality gate (modularity report, UI/logic separation report,
+#     dead-end report, logic-gap report). Those run on a dedicated runner
+#     with Claude Code attached. GitHub Actions does not exfiltrate source
+#     to a model provider; the AI gate is a separate job orchestrated by
+#     the project's `running-pipeline-gate` skill.
+#   - Approvals (`_approval-plan.json`, `_approval-merge.json`). Those are
+#     produced by the slash-command bot and committed to the branch.
+#
+# Project authors: this file is a template. Replace the `# project:` lines
+# with the concrete commands for your stack. The reference assumes a Node
+# project; for Swift/Kotlin/Python, swap the Setup step and the runners
+# accordingly. Multi-stack projects can convert the single job into a matrix
+# along `stack: [node, ios, android]` and gate stack-specific steps with
+# `if: matrix.stack == 'node'`.
+
+name: dev-pipeline
+
+on:
+  push:
+    branches:
+      - "feature/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dev-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Tests-first validator walks per-file git history; full clone needed.
+          fetch-depth: 0
+
+      - name: Setup Node
+        # project: pin to your project's Node version.
+        # Multi-stack note: replace this step with setup-java / setup-python /
+        # setup-go etc. when extending to other stacks.
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        # project: replace with: yarn install --frozen-lockfile
+        run: |
+          echo "project: replace with: yarn install --frozen-lockfile"
+
+      - name: Lint
+        id: lint
+        run: |
+          # project: replace with: yarn lint --format unix | tee lint.out
+          echo "project: replace with: yarn lint" | tee lint.out
+
+      - name: Upload lint output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint
+          path: lint.out
+
+      - name: Typecheck
+        id: typecheck
+        run: |
+          # project: replace with: yarn tsc --noEmit | tee typecheck.out
+          echo "project: replace with: yarn tsc --noEmit" | tee typecheck.out
+
+      - name: Upload typecheck output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck
+          path: typecheck.out
+
+      - name: Dead code (knip)
+        id: dead-code
+        run: |
+          # Node-only tool. Replace with the equivalent for non-Node stacks
+          # (e.g. unused-imports, vulture for Python, deadcode for Swift).
+          npx --yes knip --no-progress | tee dead-code.out || true
+
+      - name: Upload dead-code output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dead-code
+          path: dead-code.out
+
+      - name: Unit tests
+        id: unit-tests
+        run: |
+          # project: replace with: yarn test --ci --reporters=default --reporters=jest-junit | tee unit-tests.out
+          echo "project: replace with: yarn test --ci" | tee unit-tests.out
+
+      - name: Upload unit-tests output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests
+          path: unit-tests.out
+
+      - name: E2E tests
+        id: e2e-tests
+        run: |
+          # project: replace with: yarn e2e:ci | tee e2e-tests.out
+          # E2E often needs an emulator/simulator; consider a separate workflow
+          # if your runner cannot host the device.
+          echo "project: replace with: yarn e2e:ci" | tee e2e-tests.out
+
+      - name: Upload e2e-tests output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-tests
+          path: e2e-tests.out
+
+      - name: Dependency audit
+        id: dependency-audit
+        run: |
+          # project: replace with the audit tool for your stack.
+          # Node default below. Swift: `swift package audit` (when available) or third-party.
+          # Python: `pip-audit`. Java: `gradle dependencyCheckAnalyze`.
+          npm audit --audit-level=high | tee dependency-audit.out || true
+
+      - name: Upload dependency-audit output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit
+          path: dependency-audit.out
+
+      - name: Validate pipeline artifacts
+        id: validate-pipeline
+        # Runs the stage 05 validators against the branch's .pipeline/05-dev/.
+        # The `feature/<TICKET>/<slug>` convention means the .pipeline/ tree
+        # is committed to the branch; if your branch carries multiple features,
+        # iterate over each feature directory.
+        run: |
+          set -u
+          PIPELINE_ROOT=".pipeline"
+          DEV_DIR="$PIPELINE_ROOT/05-dev"
+          SPEC_DIR="$PIPELINE_ROOT/02-spec"
+          OUT="validate-pipeline.out"
+
+          {
+            if [[ ! -d "$DEV_DIR" ]]; then
+              echo "SKIP: $DEV_DIR not present on this branch (pre-stage-05 branch)."
+              exit 0
+            fi
+
+            echo "== check-plan.sh =="
+            pipeline/validators/check-plan.sh "$DEV_DIR/plan.md" || exit 1
+
+            echo "== check-tests-first.sh =="
+            pipeline/validators/check-tests-first.sh "$DEV_DIR" "." || exit 1
+
+            echo "== check-coverage-mapping.sh =="
+            pipeline/validators/check-coverage-mapping.sh \
+              "$DEV_DIR/tests-plan.md" "$SPEC_DIR/user-journeys.md" || exit 1
+
+            echo "== check-quality-thresholds.sh =="
+            pipeline/validators/check-quality-thresholds.sh "$DEV_DIR/quality-reports" || exit 1
+
+            echo "== check-merge-readiness.sh =="
+            pipeline/validators/check-merge-readiness.sh "$DEV_DIR" || exit 1
+          } 2>&1 | tee "$OUT"
+
+      - name: Upload validate-pipeline output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validate-pipeline
+          path: validate-pipeline.out

@@ -1,0 +1,26 @@
+# Approver matrix for pipeline stages.
+# CI bot reads this to decide who must approve each stage.
+# An author cannot self-approve (enforced by validator against `git log`).
+
+stages:
+  01-idea:
+    required:
+      - { role: PM, count: 1 }
+  02-spec:
+    required:
+      - { role: PM, count: 1 }
+      - { role: TechLead, count: 1 }
+  03-ux:
+    required:
+      - { role: UX, count: 1 }
+      - { role: PM, count: 1 }
+  04-architecture:
+    required:
+      - { role: TechLead, count: 1 }
+
+# Map emails to one or more roles. A person can hold multiple roles.
+people:
+  filip.wareluk@example.com: [Engineer]
+  pm@example.com: [PM]
+  ux@example.com: [UX]
+  lead@example.com: [TechLead]
