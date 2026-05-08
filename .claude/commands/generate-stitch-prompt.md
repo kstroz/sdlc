@@ -7,9 +7,10 @@ generate visual mockups. Stitch exports then go into `.pipeline/03-ux/_inputs/` 
 
 ## What to read first
 
-1. `.pipeline/02-spec/prd.md` — epics, stories, acceptance criteria (required).
-   If missing, run `/stage-02` first and stop.
-2. `PRODUCT.md` — personas for user context in each screen description.
+1. `.pipeline/02-spec/prd.md` — epics index and NFRs (required).
+2. `.pipeline/02-spec/stories/` — all US-NNN story files, acceptance criteria (required).
+   If either is missing, run `/stage-02` first and stop.
+3. `PRODUCT.md` — personas for user context and NFRs for accessibility constraints.
 
 ## What to produce
 
@@ -19,39 +20,38 @@ into Stitch manually.
 Structure the output as follows:
 
 ```
-# Stitch prompt — <Product name>
-
 ## App context
-<2–3 sentences: what the app is, who uses it, the primary use environment
-(e.g. field work, outdoors, gloved hands, low connectivity). This gives Stitch
-the design register: functional, high-contrast, large touch targets.>
+<2–3 sentences: what the app is, who uses it, primary use environment.>
 
-## Design direction
-<4–6 bullet points covering: colour register, typography scale, component density,
-iconography style, key accessibility constraints. Derive from persona frustrations
-and NFRs — do not invent aesthetic preferences not grounded in the PRD.>
+## Design system — Material Design 3
+<Specify the M3 colour scheme: primary, secondary, tertiary, surface, error roles
+with hex values derived from the product domain. Specify the type scale roles used
+per surface (Display/Headline/Title/Body/Label). List the M3 components used across
+the app (TopAppBar, NavigationBar, Card, FilledButton, Chip, Snackbar, etc.).
+Note shape tokens (ExtraSmall/Small/Medium/Large/ExtraLarge) and their dp values.>
 
 ## Screens
 
 ### Screen N — <Screen name>
-**User**: <P-NN persona role>
-**Goal**: <one sentence — what the user is trying to accomplish on this screen>
-**Key components**:
-- <component name> — <one-line description of what it shows or does>
-- ...
-**States to show**: <comma list: default, empty, loading, error, offline — only those relevant>
+**User**: <persona role>
+**Goal**: <one sentence>
+**M3 components**:
+- <exact M3 component name> — <one-line description>
+**States to show**: <comma list — only those that apply>
 **Critical UX rules**:
-- <constraint derived from acceptance criteria or NFR — e.g. "No text input required", "Primary action ≥ 64pt height">
-- ...
+- <constraint traced to an acceptance criterion or NFR>
 
-Repeat per screen. Derive screens directly from story acceptance criteria —
-every distinct surface a user interacts with becomes a screen.
+Repeat per screen. Order by natural user flow.
 ```
 
-## Rules for writing screen descriptions
+## Rules
 
-- Name components using PRODUCT.md Glossary terms where they exist.
-- Every "Critical UX rule" must trace to an acceptance criterion or NFR — no invented constraints.
-- Include offline/sync states only on screens where US-007 or US-008 apply.
-- Order screens by the user's natural flow through the app (login → home → task → completion).
-- Keep each screen description under 120 words — Stitch works best with focused prompts.
+- Use exact Material Design 3 component names: FilledButton not "primary button",
+  TopAppBar (Small) not "header", FilterChip not "tag", Snackbar not "toast".
+- Colour roles must follow M3 conventions: primary, onPrimary, primaryContainer,
+  onPrimaryContainer, secondary, surface, onSurface, error, onError, outline.
+- Every touch target ≥ 56dp (NFR-04 gloved use). State this explicitly per CTA.
+- Offline is a first-class state, not an error — use an informational Snackbar or
+  Banner, not an error colour.
+- No invented design decisions — every constraint must trace to a story or NFR.
+- Keep each screen description under 150 words.
