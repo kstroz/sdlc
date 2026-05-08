@@ -1,11 +1,39 @@
 # SDLC Pipeline
 
-Forkable, repeatable pipeline that takes a feature from raw client input through to merge-ready code with tests, ADRs, and quality reports. Stages 01–04 generate specification artifacts. Stage 05 generates code under TDD and quality gates, autonomously where possible.
+Forkable, AI-driven pipeline that turns a one-paragraph brief into merge-ready code with tests, ADRs, and quality reports.
+
+---
+
+## 🚀 Just forked? Start here
+
+```bash
+gh repo fork kstroz/sdlc --clone
+cd sdlc
+claude
+```
+
+Inside Claude Code, run **one command**:
+
+```
+/start-flow
+```
+
+The wizard takes it from there: asks if you have a tracker ticket (or generates `LOCAL-NNNN`), takes your brief, asks which platforms you are building (iOS / Android / cross-platform mobile / web / backend / desktop / CLI), asks per-platform tech preferences only where relevant, and walks you stage-by-stage to merge-ready code. Re-run `/start-flow` after each stage to advance.
+
+> **First time on this repo?** Read § "What is this?" below. **Already familiar?** Just run `/start-flow`.
+
+---
+
+## What is this?
+
+Stages 01–04 generate specification artifacts (idea, PRD + stories, optional UX, architecture). Stage 05 generates code under TDD and quality gates, autonomously where possible.
 
 ```
 01 idea  →  02 spec   →  03 ux  →  04 architecture  →  05 development
             (stories)                                  (plan + impl loop + reports)
 ```
+
+Every stage has a validator that must exit 0 before the gate, and a JSON approval file that a human commits before the next stage starts. Stage 05 wraps everything in an autonomous loop driven by `/ralph-loop` that drives TDD per task and emits `<promise>MERGE-READY</promise>` only when all checks are green.
 
 ## Prerequisites for a forker
 
@@ -22,15 +50,23 @@ On macOS / Linux: `brew install git node jq` (Linux: `apt install jq`). `bash` a
 
 No global Claude Code plugins are required — the ralph-loop stop hook, agents, and skills are vendored into `.claude/` per fork.
 
-## Quick start — running the pipeline on a new feature
+## Detailed walkthrough — what `/start-flow` actually does
 
-1. **Fork this repo** (GitHub → "Fork", or `gh repo fork kstroz/sdlc --clone`).
-2. **Open Claude Code** at the repo root and run **one** command:
-   ```
-   /start-flow
-   ```
-   The wizard handles everything: it seeds the feature branch (`init-project.sh`), captures the brief (paste, file path, or pointer to `_inputs/`), asks which platforms you are building (mobile-ios, mobile-android, mobile-cross-platform, web, backend, desktop, cli), asks per-platform tech preferences only when relevant (e.g. mobile cross-platform → React Native vs Flutter; iOS native → SwiftUI vs UIKit), writes `_inputs/stack-preferences.md`, and runs `/stage-01` to produce `idea.md`. Re-run `/start-flow` at any time to advance to the next stage — it detects what is done and resumes.
-3. **Advanced users** can call individual stages directly: `/generate-product`, `/stage-01`..`/stage-05`. The wizard is the recommended path for the first run.
+For users who want to know what the wizard is doing under the hood, or who prefer to drive the stages manually:
+
+1. **Setup.** Asks "Do you have a tracker ticket?" (yes → paste any ID, or no → wizard synthesises `LOCAL-NNNN`). Takes your brief (paste, file path, or already-in-`_inputs/`). Auto-derives a short branch name from the brief's first line. Runs `bash pipeline/bin/init-project.sh <TICKET> <short-name>` which creates the `feature/<TICKET>/<short-name>` branch and seeds `.pipeline/`.
+
+2. **Platform selection.** Multi-select via `AskUserQuestion`: mobile-ios, mobile-android, mobile-cross-platform, web, desktop, backend (new or existing), cli, other. The picks land in `idea.md` `## Platforms` with state `yes` / `no` / `existing` / `deferred`.
+
+3. **Tech preferences.** Adaptive — only asks the platforms you picked. iOS native → SwiftUI vs UIKit; Android native → Compose vs XML; cross-platform mobile → React Native + Expo vs RN bare vs Flutter vs Capacitor; backend new → Node Express/Fastify vs Python FastAPI/Django vs Go vs Java Spring; web → Next.js vs React+Vite vs SvelteKit vs Vue. Each question always has "Let architect decide at Stage 04" as a valid answer.
+
+4. **Override authority.** Hard preference (architect MUST use), soft preference (architect treats as first alternative), or no preference (skip writing `stack-preferences.md`).
+
+5. **Run `/stage-01`.** Wizard writes `_inputs/stack-preferences.md` and `idea.md` (with `## Platforms` pre-filled from step 2). Runs `pipeline/validators/check-idea.sh`. Exit 0 means the stage gate is open.
+
+6. **Stop and stage gate.** Wizard prints next-step suggestion. Re-run `/start-flow` to advance, or call `/stage-02`, `/stage-03`, `/stage-04`, `/stage-05` directly.
+
+**Advanced users** can skip the wizard and call the stage commands directly. They are functionally equivalent — the wizard just shortens the first-time experience.
 
 For each stage, the matching validator must exit 0 before the gate. The slash command runs the validator at the end and reports failures.
 
