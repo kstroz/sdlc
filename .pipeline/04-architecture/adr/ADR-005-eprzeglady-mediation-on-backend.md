@@ -12,7 +12,7 @@ related-nfrs: NFR-02, NFR-03
 
 ## Context
 
-FR-017 requires completion records to reach ePrzeglądy within 1 hour of sync. ePrzeglądy is an external system with its own auth, schema, and rate limits, not under our team's control. The mobile app must not depend on ePrzeglądy availability — a brief outage cannot block a technician's completion (NFR-03 reliability).
+US-013 requires completion records to reach ePrzeglądy within 1 hour of sync. ePrzeglądy is an external system with its own auth, schema, and rate limits, not under our team's control. The mobile app must not depend on ePrzeglądy availability — a brief outage cannot block a technician's completion (NFR-03 reliability).
 
 ## Decision
 
@@ -33,4 +33,4 @@ The mobile app sends completion records exclusively to our own backend (already 
 
 ## Alternatives Considered
 - **App-direct integration with ePrzeglądy** — Would require shipping ePrzeglądy credentials to every device (rejected on security grounds), and would couple app uptime to ePrzeglądy uptime (rejected on NFR-03 grounds).
-- **No ePrzeglądy integration in MVP** — Was considered, but the FR-017 promise is core to the value proposition (replace the office bottleneck). The brief explicitly names ePrzeglądy as a must-have integration. Rejected.
+- **No ePrzeglądy integration in MVP** — Was considered, but the US-013 promise is core to the value proposition (replace the office bottleneck). The brief explicitly names ePrzeglądy as a must-have integration. Rejected.

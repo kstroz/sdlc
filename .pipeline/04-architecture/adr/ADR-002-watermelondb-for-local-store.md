@@ -12,7 +12,7 @@ related-nfrs: NFR-02, NFR-03, NFR-05
 
 ## Context
 
-NFR-03 requires the app to function with zero connectivity for at least 24 hours. NFR-02 requires zero data loss on crash or restart. The data model includes Tasks, Buildings, Photos, and a Sync Queue, with reads on every screen and writes on completion actions. The app must scale to a few thousand tasks per technician per year without lag (FR-004 list rendering at less than 1 second). Photos are large binary blobs requiring a separate storage strategy.
+NFR-03 requires the app to function with zero connectivity for at least 24 hours. NFR-02 requires zero data loss on crash or restart. The data model includes Tasks, Buildings, Photos, and a Sync Queue, with reads on every screen and writes on completion actions. The app must scale to a few thousand tasks per technician per year without lag (US-003 list rendering at less than 1 second). Photos are large binary blobs requiring a separate storage strategy.
 
 ## Decision
 

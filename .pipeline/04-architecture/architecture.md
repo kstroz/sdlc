@@ -23,7 +23,7 @@ This separation is enforced by the Stage 05 `pure-function-policy` and `applying
 WatermelonDB (SQLite-backed) for relational data (ADR-002). Photo binaries on the filesystem via expo-file-system (ADR-004). Outbox table inside the same SQLite database carries queued offline actions with idempotency keys (ADR-003).
 
 ### Sync worker
-Runs in the mobile app. On connectivity change or app foreground, drains the Outbox in FIFO order, sending each action to the backend with its idempotency key. Failures are retried with exponential backoff up to 5 attempts; permanent failures are surfaced in the UI (FR-014).
+Runs in the mobile app. On connectivity change or app foreground, drains the Outbox in FIFO order, sending each action to the backend with its idempotency key. Failures are retried with exponential backoff up to 5 attempts; permanent failures are surfaced in the UI (US-010).
 
 ### Backend (existing)
 Hosted in GitLab; this branch adds the endpoints listed in api-contracts.md. The backend owns:
@@ -38,7 +38,7 @@ Hosted in GitLab; this branch adds the endpoints listed in api-contracts.md. The
 Third-party central inspection-management system. The mobile app does not communicate with ePrzeglądy directly; the backend forwards completion records via a separate worker (ADR-005).
 
 ### Push provider (external)
-Apple Push Notification Service (APNs) and Firebase Cloud Messaging (FCM) for delivering urgent-task notifications (FR-016). The backend holds provider credentials.
+Apple Push Notification Service (APNs) and Firebase Cloud Messaging (FCM) for delivering urgent-task notifications (US-012). The backend holds provider credentials.
 
 ### Object storage
 Existing S3-compatible bucket holds synced photos. The backend writes; the mobile app does not access object storage directly.

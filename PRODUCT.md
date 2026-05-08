@@ -46,7 +46,7 @@ Property management organisations in Poland that operate housing portfolios with
 - **Definition**: A managed residential or commercial property identified by street address; the unit at which tasks are scoped and grouped on the technician's list.
 - **Source**: `_inputs/interview-2026-05-08.md:L11` — *"Address, what to do — like 'check pressure on boiler'"*
 - **Synonyms**: site, property
-- **Used in**: idea.md, prd.md, user-journeys.md, data-model.md
+- **Used in**: idea.md, prd.md, 02-spec/stories/, data-model.md
 
 ### ePrzeglądy
 - **Definition**: External central inspection-management system operated by a third party; receives gas inspection protocols and other regulated check records.
@@ -64,4 +64,4 @@ Property management organisations in Poland that operate housing portfolios with
 - **Definition**: A discrete unit of work assigned to a technician at a specific building; has a status (pending, done, blocked) and may require a photo as completion proof.
 - **Source**: `_inputs/interview-2026-05-08.md:L29` — *"I write on the printed list. Done, done, done."*
 - **Synonyms**: job, work item
-- **Used in**: prd.md, functional-requirements.md, user-journeys.md, data-model.md
+- **Used in**: prd.md, 02-spec/stories/, data-model.md, 05-dev/plan.md

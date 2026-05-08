@@ -12,7 +12,7 @@ related-nfrs: NFR-02, NFR-03
 
 ## Context
 
-FR-012 requires every offline action (mark done, attach photo, block with reason) to be queued locally and replayed on reconnect (FR-013, FR-014). NFR-02 demands zero data loss on crash. Mobile networks drop and reappear unpredictably; the same action may be retried by the OS, by the app on next launch, or by the user pulling to refresh. The backend must not double-apply a task completion.
+US-009 requires every offline action (mark done, attach photo, block with reason) to be queued locally and replayed on reconnect (US-010). NFR-02 demands zero data loss on crash. Mobile networks drop and reappear unpredictably; the same action may be retried by the OS, by the app on next launch, or by the user pulling to refresh. The backend must not double-apply a task completion.
 
 ## Decision
 

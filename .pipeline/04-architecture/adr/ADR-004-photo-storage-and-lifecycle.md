@@ -12,7 +12,7 @@ related-nfrs: NFR-02, NFR-04, NFR-05
 
 ## Context
 
-FR-009 requires photos attached to completion records. Photos are typically 2–5 MB each, JPEG. Technicians may take multiple photos per task, multiple tasks per day, multiple days offline. NFR-05 requires local storage to free space when synced photos exceed 7 days locally with zero photos lost during cleanup. NFR-04 requires that photo handling not dominate battery use.
+US-007 requires photos attached to completion records. Photos are typically 2–5 MB each, JPEG. Technicians may take multiple photos per task, multiple tasks per day, multiple days offline. NFR-05 requires local storage to free space when synced photos exceed 7 days locally with zero photos lost during cleanup. NFR-04 requires that photo handling not dominate battery use.
 
 ## Decision
 

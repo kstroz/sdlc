@@ -159,7 +159,7 @@ jobs:
 
             echo "== check-coverage-mapping.sh =="
             pipeline/validators/check-coverage-mapping.sh \
-              "$DEV_DIR/tests-plan.md" "$SPEC_DIR/user-journeys.md" || exit 1
+              "$DEV_DIR/tests-plan.md" "$DEV_DIR/plan.md" || exit 1
 
             echo "== check-quality-thresholds.sh =="
             pipeline/validators/check-quality-thresholds.sh "$DEV_DIR/quality-reports" || exit 1

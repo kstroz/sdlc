@@ -11,7 +11,7 @@ version: 1
 ## POST /auth/sign-in
 - **Endpoint ID**: API-01
 - **Purpose**: Exchange username and password for a session token used on every subsequent request.
-- **Source screens**: Screen: Sign-in (FR-001)
+- **Source screens**: Screen: Sign-in (US-001)
 - **Auth**: None
 - **Request**:
   - Headers: `Content-Type: application/json`
@@ -27,15 +27,15 @@ version: 1
     { "userId": "uuid", "displayName": "string", "sessionToken": "string", "expiresAt": "iso8601" }
     ```
 - **Response errors**:
-  - 4xx: 401 — invalid credentials. Sign-in screen renders an inline error (FR-002).
+  - 4xx: 401 — invalid credentials. Sign-in screen renders an inline error (US-001).
   - 5xx: 503 — backend unavailable. Sign-in screen offers Retry.
 - **Idempotency**: No — multiple sign-ins are valid; each issues a fresh token.
 - **Rate limit**: 10/min/ip to limit credential stuffing.
 
 ## GET /tasks/today
 - **Endpoint ID**: API-02
-- **Purpose**: Return the calling user's tasks scheduled for today, grouped server-side by building, used by Today screen and as the source for the local cache (FR-004).
-- **Source screens**: Screen: Today (FR-004), Screen: Task detail (FR-006 derives from same payload)
+- **Purpose**: Return the calling user's tasks scheduled for today, grouped server-side by building, used by Today screen and as the source for the local cache (US-003).
+- **Source screens**: Screen: Today (US-003), Screen: Task detail (US-004 derives from same payload)
 - **Auth**: Bearer — session token in `Authorization: Bearer <token>`
 - **Request**:
   - Headers: `Authorization`
@@ -61,8 +61,8 @@ version: 1
 
 ## POST /tasks/{id}/complete
 - **Endpoint ID**: API-03
-- **Purpose**: Record a task completion; replay-safe with an idempotency key (FR-008, ADR-003).
-- **Source screens**: Screen: Task detail (FR-008)
+- **Purpose**: Record a task completion; replay-safe with an idempotency key (US-006, ADR-003).
+- **Source screens**: Screen: Task detail (US-006)
 - **Auth**: Bearer
 - **Request**:
   - Headers: `Authorization`, `Idempotency-Key: <uuid>`, `Content-Type: application/json`
@@ -80,14 +80,14 @@ version: 1
 - **Response errors**:
   - 4xx: 409 — task already in a terminal status. Client treats as success (idempotent dedup).
   - 4xx: 401 — invalid or expired token.
-  - 5xx: 503 — backend unavailable. Client retains the queued action for retry (FR-014).
+  - 5xx: 503 — backend unavailable. Client retains the queued action for retry (US-010).
 - **Idempotency**: Yes (key: `Idempotency-Key` header).
 - **Rate limit**: 120/min/user.
 
 ## POST /tasks/{id}/block
 - **Endpoint ID**: API-04
-- **Purpose**: Record that a task could not be completed, with one of the preset reasons (FR-010).
-- **Source screens**: Screen: Task detail (FR-010)
+- **Purpose**: Record that a task could not be completed, with one of the preset reasons (US-008).
+- **Source screens**: Screen: Task detail (US-008)
 - **Auth**: Bearer
 - **Request**:
   - Headers: `Authorization`, `Idempotency-Key: <uuid>`, `Content-Type: application/json`
@@ -111,8 +111,8 @@ version: 1
 
 ## POST /photos
 - **Endpoint ID**: API-05
-- **Purpose**: Upload a single photo binary as multipart/form-data and link it to a task (FR-009).
-- **Source screens**: Screen: Task detail / Completion sheet (FR-009)
+- **Purpose**: Upload a single photo binary as multipart/form-data and link it to a task (US-007).
+- **Source screens**: Screen: Task detail / Completion sheet (US-007)
 - **Auth**: Bearer
 - **Request**:
   - Headers: `Authorization`, `Idempotency-Key: <uuid>`, `Content-Type: multipart/form-data`
@@ -130,13 +130,13 @@ version: 1
 - **Response errors**:
   - 4xx: 413 — file too large (limit 15 MB). Client downscales and retries.
   - 4xx: 415 — unsupported content type. Client warns user.
-  - 5xx: 503 — retain in queue for retry; subject to wifi-only policy (FR-015).
+  - 5xx: 503 — retain in queue for retry; subject to wifi-only policy (US-011).
 - **Idempotency**: Yes (key: `Idempotency-Key`).
 - **Rate limit**: 30/min/user.
 
 ## POST /devices/register
 - **Endpoint ID**: API-06
-- **Purpose**: Register the device for push notifications (FR-016).
+- **Purpose**: Register the device for push notifications (US-012).
 - **Source screens**: Screen: Today (background call after sign-in)
 - **Auth**: Bearer
 - **Request**:
