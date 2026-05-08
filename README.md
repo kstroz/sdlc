@@ -46,7 +46,7 @@ No global Claude Code plugins are required — the ralph-loop stop hook, agents,
 Stage 05 has a manual plan gate followed by an autonomous implementation loop:
 
 ```
-05.0 bootstrap  →  05.1 plan  →  [PLAN GATE]  →  05.2 tests  →  05.3 impl  →  05.4 quality  →  05.8 changelog  →  [MERGE GATE]
+05.0 bootstrap  →  05.1 plan  →  [PLAN GATE]  →  05.2 tests  →  05.3 impl  →  05.4 quality  →  05.6 security  →  05.7 code review  →  05.8 changelog  →  [MERGE GATE]
 ```
 
 1. Run `/stage-05`. The skill `bootstrapping-project` (05.0) scaffolds `app/` from `tech-stack.md` if it does not exist, then `breaking-down-feature-into-tasks` (05.1) generates `plan.md` and the per-task detail files.
@@ -58,8 +58,8 @@ Stage 05 has a manual plan gate followed by an autonomous implementation loop:
    ```
    /ralph-loop "Apply skill: running-impl-loop" --completion-promise "MERGE-READY" --max-iterations 50
    ```
-   The loop reads `.claude/PROGRESS.md` to know its phase, drives TDD per task, runs the four quality gate skills, and only outputs `<promise>MERGE-READY</promise>` when `check-merge-readiness.sh` exits 0. To cancel: `/cancel-ralph`.
-4. Run `/review-pr` for a human-gate review with the vendored agents from `pr-review-toolkit`.
+   The loop reads `.claude/PROGRESS.md` to know its phase, drives TDD per task, runs the four quality gate skills, then security review (05.6) and code review (05.7), and only outputs `<promise>MERGE-READY</promise>` when `check-merge-readiness.sh` exits 0. To cancel: `/cancel-ralph`.
+4. Review the aggregated `quality-reports/code-review.md` and commit `_approval-merge.json` to close the merge gate.
 
 ## Repo layout
 
@@ -132,9 +132,9 @@ The author of a stage cannot approve their own work.
 
 ## Status of skills
 
-**Phase 1 (15 skills referenced by README, owned by Stage 02–04 conventions)**: skill files are still being landed in `.claude/skills/` by the Phase 1 author. The slash commands (`/stage-01..04`) describe what each skill should produce; if a SKILL.md is missing the slash command itself is enough to drive Claude through the stage.
+**Phase 1 (Stage 02–04 conventions)**: dedicated SKILL.md files for the 15 skills named by the conventions are not present in `.claude/skills/` at this time. The slash commands (`/stage-01..04`) contain procedural instructions and can drive Claude through each stage end-to-end without skill files. Phase 1 SKILL.md files will land separately when their owner adds them.
 
-**Phase 2 (12 skills, .claude/skills/)**:
+**Phase 2 (17 skills, .claude/skills/)**:
 - `bootstrapping-project` (05.0)
 - `breaking-down-feature-into-tasks` (05.1)
 - `mapping-tests-to-stories` (05.2)
@@ -143,8 +143,11 @@ The author of a stage cannot approve their own work.
 - `reviewing-modularity`, `reviewing-ui-logic-separation` (05.4)
 - `detecting-user-dead-ends`, `detecting-logic-gaps` (05.4)
 - `discovering-edge-cases` (05.5)
+- `security-reviewing-stage-05` (05.6)
+- `coordinating-code-review` (05.7)
 - `amending-adrs-during-development`, `generating-changelog` (05.8)
 - `running-impl-loop` — the master orchestrator driven by `/ralph-loop`
+- `running-pipeline-gate`, `requesting-customer-input` — cross-cutting
 
 Vendored from upstream plugins for in-repo self-sufficiency: `test-driven-development`, `systematic-debugging`, `verification-before-completion` (skills); the six PR review subagents.
 

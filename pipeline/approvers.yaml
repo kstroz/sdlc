@@ -17,6 +17,13 @@ stages:
   04-architecture:
     required:
       - { role: TechLead, count: 1 }
+  05-dev-plan:
+    required:
+      - { role: TechLead, count: 1 }
+  05-dev-merge:
+    required:
+      - { role: TechLead, count: 1 }
+      - { role: PM, count: 1 }
 
 # Map emails to one or more roles. A person can hold multiple roles.
 people:

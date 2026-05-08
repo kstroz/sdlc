@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Security Exceptions",
+  "exceptions": [
+    {
+      "id": "SEC-EXC-001",
+      "cve": "CVE-2024-21538",
+      "package": "cross-spawn@7.0.3",
+      "severity": "HIGH",
+      "reason": "Upstream patch pending; transitive dep via build tooling, not exposed at runtime. Tracked for removal in Q3 dep refresh.",
+      "tracking_ticket": "PIPE-2471",
+      "expires": "2026-08-01",
+      "approver": "Priya Raman",
+      "approved_at": "2026-05-03"
+    }
+  ]
+}
