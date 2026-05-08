@@ -35,13 +35,29 @@ Tell the user the detected state in one short sentence, then proceed with that s
 
 ## Step 1 — Initialise the project
 
-Ask the user for the JIRA ticket ID and a short slug (or auto-derive a slug if the user does not have JIRA). Then run:
+Ask the user **two short questions** via `AskUserQuestion`:
+
+### Q1 — Do you have a tracker ticket?
+
+Header: "Tracker". Options:
+- **Yes — JIRA / Linear / GitHub issue / etc.** — User will paste the ID in the next message (e.g. `BAJ-100`, `LIN-42`, `GH-1234`). Free-form, the wizard does not parse it.
+- **No tracker — generate a local ID** — Wizard synthesises `LOCAL-<NNNN>` where `NNNN` is `001` for the first feature, or one higher than the highest existing `feature/LOCAL-XXXX/*` branch. Pure local convention; can be replaced later by editing the `jira:` frontmatter when the team adopts a tracker.
+
+### Q2 — Short slug for the branch
+
+Always ask. One- or two-word kebab-case description, e.g. `task-tracker`, `auth-rewrite`, `inspection-app`. The wizard sanitises (lowercase, replace spaces with hyphens, strip punctuation).
+
+If the user picked "Yes" in Q1, ask them to paste the ticket ID in the next message before Q2 (or accept it inline if they already wrote it).
+
+### Run init
 
 ```bash
 bash pipeline/bin/init-project.sh <TICKET-ID> <slug>
 ```
 
-This switches to `feature/<TICKET>/<slug>` and seeds `.pipeline/`. Confirm the branch is now active and re-run state detection (back to top).
+`<TICKET-ID>` is either the user-supplied tracker ID or the synthesised `LOCAL-NNNN`. The script switches to branch `feature/<TICKET-ID>/<slug>` and seeds `.pipeline/`. Confirm the branch is now active and re-run state detection (back to top).
+
+Note: every artifact's `jira:` frontmatter will receive this value. Validators check that the field exists, not its format, so any non-empty string works. If the team later adopts a tracker, the value can be search-and-replaced across `.pipeline/` without breaking anything else.
 
 ## Step 2 — Capture the brief
 
