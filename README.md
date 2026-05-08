@@ -25,21 +25,14 @@ No global Claude Code plugins are required — the ralph-loop stop hook, agents,
 ## Quick start — running the pipeline on a new feature
 
 1. **Fork this repo** (GitHub → "Fork", or `gh repo fork kstroz/sdlc --clone`).
-2. **Seed a feature branch** from your fork's root:
-   ```bash
-   bash pipeline/bin/init-project.sh BAJ-123 my-feature
+2. **Open Claude Code** at the repo root and run **one** command:
    ```
-3. **Drop your raw input** (brief, transcripts) into `.pipeline/01-idea/_inputs/`. Optionally also drop `_inputs/stack-preferences.md` (see `pipeline/conventions/01-idea/stack-preferences-template.md`) if you have an opinion on the tech stack before architecture is decided.
-4. **Open Claude Code** in the project root and walk the stages:
+   /start-flow
    ```
-   /generate-product           # PRODUCT.md (one-time per product)
-   /stage-01                   # idea.md
-   /stage-02                   # prd.md + stories/US-NNN-*.md
-   /stage-03                   # screens, flows, tokens (optional but recommended for UI work)
-   /stage-04                   # tech-stack, data-model, api-contracts, ADRs
-   /stage-05                   # see below
-   ```
-5. **For each stage**, the matching validator must exit 0 before the gate. The slash command runs the validator at the end and reports failures.
+   The wizard handles everything: it seeds the feature branch (`init-project.sh`), captures the brief (paste, file path, or pointer to `_inputs/`), asks which platforms you are building (mobile-ios, mobile-android, mobile-cross-platform, web, backend, desktop, cli), asks per-platform tech preferences only when relevant (e.g. mobile cross-platform → React Native vs Flutter; iOS native → SwiftUI vs UIKit), writes `_inputs/stack-preferences.md`, and runs `/stage-01` to produce `idea.md`. Re-run `/start-flow` at any time to advance to the next stage — it detects what is done and resumes.
+3. **Advanced users** can call individual stages directly: `/generate-product`, `/stage-01`..`/stage-05`. The wizard is the recommended path for the first run.
+
+For each stage, the matching validator must exit 0 before the gate. The slash command runs the validator at the end and reports failures.
 
 ### Where do I say "this is a mobile app, not a web app"?
 

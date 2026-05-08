@@ -22,32 +22,31 @@ No global Claude Code plugins required. See `README.md` § "Prerequisites for a 
 
 ## 3. Your first feature in 10 minutes
 
-Counter app, end to end:
+The fastest path is the wizard:
 
 ```bash
-# a. Fork on GitHub, then clone your fork
+# a. Fork on GitHub, clone, open Claude Code at the root
 gh repo fork kstroz/sdlc --clone
 cd sdlc
-
-# b. Seed a feature branch + .pipeline/ scaffold
-bash pipeline/bin/init-project.sh BAJ-001 hello-world
-
-# c. Drop the brief
-echo 'A counter app where users tap +/-' > .pipeline/01-idea/_inputs/brief.md
-
-# d. Open Claude Code and walk the stages
 claude
 ```
 
-Inside Claude Code, run these in order. Each command stops at its gate; commit the `_approval.json` it asks for before moving on.
+```
+# b. Inside Claude Code, run one command:
+/start-flow
+```
+
+The wizard does the rest: it asks for your JIRA ticket and slug (or generates one), prompts you to paste the brief, multi-selects which platforms you are building (iOS / Android / cross-platform mobile / web / backend / desktop / cli), and only asks per-platform tech questions for the platforms you picked (e.g. "iOS UI: SwiftUI or UIKit?", "Backend: Node, Python, Go, or let architect decide?"). It writes `_inputs/stack-preferences.md` and runs `/stage-01` for you.
+
+Re-run `/start-flow` after each stage and it advances to the next one — or call `/stage-XX` directly when you want fine-grained control.
+
+After the plan gate (Stage 05.1 produces `plan.md` and stops), commit `_approval-plan.json`, then start the autonomous implementation loop:
 
 ```
-/generate-product
-/stage-01
-/stage-02
-/stage-04
-/stage-05
+/ralph-loop "Apply skill: running-impl-loop" --completion-promise "MERGE-READY" --max-iterations 50
 ```
+
+The loop drives 05.2 → 05.8 (tests-plan, TDD impl, four quality reports, security review, code review, changelog) and emits `<promise>MERGE-READY</promise>` only when `check-merge-readiness.sh` exits 0. Then commit `_approval-merge.json` and the branch is ready to merge.
 
 (Stage 03 is optional; skip it for non-UI features. Stage 05 itself runs `05.0 bootstrap` and `05.1 plan`, then stops at the plan gate.)
 
