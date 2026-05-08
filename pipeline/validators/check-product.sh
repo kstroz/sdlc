@@ -73,7 +73,7 @@ while IFS= read -r line; do
     in_glossary=false
   fi
   if [[ "$in_glossary" == true && "$line" =~ ^###\ .+ ]]; then
-    term="${line#### }"
+    term=$(echo "$line" | sed 's/^### //')
     block=$(awk -v h="### $term" '
       $0 == h {flag=1; next}
       /^### / {flag=0}
