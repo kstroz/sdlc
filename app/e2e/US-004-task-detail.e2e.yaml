@@ -1,0 +1,28 @@
+# US-004 + US-005: Task detail shows fields; "Show on map" deep-links to maps URL.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "seedCache"
+      payload:
+        tasks:
+          - id: "t-detail-1"
+            buildingId: "b-a"
+            buildingName: "Building A"
+            title: "Replace HVAC filter"
+            description: "Standard quarterly replacement on rooftop unit 3."
+            notes: "Bring 16x25x1 filter from van."
+            lat: 50.0614
+            lng: 19.9366
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  - tapOn: "Replace HVAC filter"
+  - assertVisible: "Replace HVAC filter"
+  - assertVisible: "Standard quarterly replacement on rooftop unit 3."
+  - assertVisible: "Bring 16x25x1 filter from van."
+  # US-005: map deep link.
+  - tapOn: "Show on map"
+  - assertExternalLinkInvoked:
+      # Captured by the test bridge instead of actually launching maps.
+      urlMatches: "^(geo:|https://(www\\.)?google\\.com/maps).*50\\.0614.*19\\.9366"

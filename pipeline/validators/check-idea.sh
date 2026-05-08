@@ -49,7 +49,7 @@ done
 # 3. Hypothesis must be falsifiable: contains the four required phrases.
 hyp_block=$(awk '/^## Hypothesis$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
 for phrase in "We believe" "for" "result in" "measured by"; do
-  if ! echo "$hyp_block" | grep -qiF "$phrase"; then
+  if ! echo "$hyp_block" | grep -qF "$phrase"; then
     errors+=("hypothesis: missing required phrase '$phrase'")
   fi
 done

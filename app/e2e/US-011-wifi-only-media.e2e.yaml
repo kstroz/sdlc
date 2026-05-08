@@ -1,0 +1,38 @@
+# US-011: Wifi-only media setting holds photos back on cellular.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "setNetwork"
+      payload: { online: true, type: "cellular" }
+  - testBridge:
+      action: "seedOutbox"
+      payload:
+        actions:
+          - { id: "o-text-1",  type: "TASK_COMPLETE", taskId: "t-1", hasPhoto: false, status: "queued" }
+          - { id: "o-block-1", type: "TASK_BLOCK",    taskId: "t-2", hasPhoto: false, status: "queued" }
+          - { id: "o-photo-1", type: "TASK_COMPLETE", taskId: "t-3", hasPhoto: true,  status: "queued" }
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  - tapOn: "Settings"
+  - tapOn: "Upload photos on Wi-Fi only"
+  - assertVisible: { id: "wifi-only-toggle", state: "on" }
+  - tapOn: "Back"
+  # Trigger sync explicitly.
+  - testBridge:
+      action: "triggerSync"
+  - waitFor:
+      timeoutSeconds: 30
+      condition:
+        testBridge:
+          action: "actionStatus"
+          payload: { id: "o-text-1" }
+          equals: "sent"
+  - testBridge:
+      action: "assertActionStatus"
+      payload:
+        - { id: "o-text-1",  status: "sent" }
+        - { id: "o-block-1", status: "sent" }
+        - { id: "o-photo-1", status: "queued" }
+  - assertVisible: "Photos waiting for Wi-Fi"

@@ -1,0 +1,15 @@
+# US-001 + US-002: Sign in with valid credentials and persisted session.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+flow:
+  - launchApp
+  - assertVisible: "Sign in"
+  - inputText: { id: "username", text: "marek" }
+  - inputText: { id: "password", text: "Hunter2!" }
+  - tapOn: "Sign in"
+  - assertVisible: "Today"
+  # US-002: session must survive an app restart.
+  - killApp
+  - launchApp
+  - assertVisible: "Today"
+  - assertNotVisible: "Sign in"

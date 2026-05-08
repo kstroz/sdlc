@@ -1,0 +1,36 @@
+# US-009: Offline reads + offline writes. Includes the negative path of US-006.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "seedCache"
+      payload:
+        tasks:
+          - { id: "t-off-1", buildingId: "b-a", buildingName: "Building A", title: "Reset breaker" }
+          - { id: "t-off-2", buildingId: "b-a", buildingName: "Building A", title: "Tighten valve" }
+flow:
+  # Start fully offline — no network at any point in this flow.
+  - testBridge:
+      action: "setNetwork"
+      payload: { online: false }
+  - launchApp
+  # Offline reads: cached Today screen still renders.
+  - assertVisible: "Today"
+  - assertVisible: "Reset breaker"
+  - assertVisible: "Tighten valve"
+  # Offline writes: complete a task without a photo (negative path of US-006).
+  - tapOn: "Reset breaker"
+  - tapOn: "Mark done"
+  - tapOn: "Skip photo"
+  - tapOn: "Confirm"
+  - assertVisible: "done — pending sync"
+  # The optimistic UI must reflect the change even though no request went out.
+  - tapOn: "Back"
+  - assertVisible: { id: "task-t-off-1-status", text: "done — pending sync" }
+  - testBridge:
+      action: "assertOutbox"
+      payload:
+        expect:
+          - { type: "TASK_COMPLETE", taskId: "t-off-1", status: "queued" }
+  - testBridge:
+      action: "assertNoNetworkCallsMade"

@@ -1,0 +1,30 @@
+# US-006 + US-007 + US-009: Mark task done with photo while offline; outbox enqueues.
+# Stub for an E2E runner (e.g. Maestro / Detox). Not executable today.
+appId: com.example.maintenance
+setup:
+  - testBridge:
+      action: "seedCache"
+      payload:
+        tasks:
+          - { id: "t-done-1", buildingId: "b-a", buildingName: "Building A", title: "Replace filter" }
+flow:
+  - launchApp
+  - assertVisible: "Today"
+  # US-009: go offline before performing the write.
+  - testBridge:
+      action: "setNetwork"
+      payload: { online: false }
+  - tapOn: "Replace filter"
+  - tapOn: "Mark done"
+  # US-007: photo capture (or pick from gallery as a fallback).
+  - tapOn: "Take photo"
+  - testBridge:
+      action: "providePhoto"
+      payload: { source: "gallery", asset: "fixtures/before.jpg" }
+  - tapOn: "Confirm"
+  - assertVisible: "done — pending sync"
+  - testBridge:
+      action: "assertOutbox"
+      payload:
+        expect:
+          - { type: "TASK_COMPLETE", taskId: "t-done-1", hasPhoto: true, status: "queued" }
