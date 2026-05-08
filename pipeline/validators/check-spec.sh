@@ -127,7 +127,7 @@ else
     # Statement section: required phrases.
     stmt_block=$(awk '/^## Statement$/{flag=1;next} /^## /{flag=0} flag' "$sf")
     for phrase in "As a" "I want to" "so that"; do
-      if ! echo "$stmt_block" | grep -qiF "$phrase"; then
+      if ! echo "$stmt_block" | grep -qF "$phrase"; then
         errors+=("$base: statement missing required phrase '$phrase'")
       fi
     done

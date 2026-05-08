@@ -38,6 +38,7 @@ required_sections=(
   "## Problem"
   "## Hypothesis"
   "## Target user (high-level)"
+  "## Platforms"
   "## Success criteria"
   "## Out-of-scope"
   "## Sources"
@@ -49,10 +50,17 @@ done
 # 3. Hypothesis must be falsifiable: contains the four required phrases.
 hyp_block=$(awk '/^## Hypothesis$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
 for phrase in "We believe" "for" "result in" "measured by"; do
-  if ! echo "$hyp_block" | grep -qiF "$phrase"; then
+  if ! echo "$hyp_block" | grep -qF "$phrase"; then
     errors+=("hypothesis: missing required phrase '$phrase'")
   fi
 done
+
+# 3b. Platforms: at least 1 bullet has state ': yes' or ': existing'.
+plat_block=$(awk '/^## Platforms$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
+plat_active=$(echo "$plat_block" | grep -cE '^- .*:[[:space:]]*(yes|existing)\b')
+if (( plat_active < 1 )); then
+  errors+=("platforms: need at least 1 bullet with state 'yes' or 'existing' — a project where every platform is 'no' or 'deferred' has no scope")
+fi
 
 # 4. Success criteria: at least 3 bullets, each with a digit.
 crit_block=$(awk '/^## Success criteria$/{flag=1; next} /^## /{flag=0} flag' "$FILE")

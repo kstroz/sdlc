@@ -1,0 +1,9 @@
+{
+  "decision": "approved",
+  "approver": "name@example.com",
+  "date": "2026-01-01",
+  "branch": "feature/example-branch",
+  "merge_id": "CHANGELOG-001",
+  "quality_reports_acked": true,
+  "comments": ""
+}

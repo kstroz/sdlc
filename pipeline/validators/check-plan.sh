@@ -59,11 +59,8 @@ while IFS= read -r tid; do
     flag {print}
   ' "$FILE")
 
-  if ! echo "$block" | grep -qE 'FR-[0-9]{3}'; then
-    errors+=("$tid: no FR-NNN reference in Requirements")
-  fi
-  if ! echo "$block" | grep -qE 'J-[0-9]{2}'; then
-    errors+=("$tid: no J-NN reference in Journeys")
+  if ! echo "$block" | grep -qE 'US-[0-9]{3}'; then
+    errors+=("$tid: no US-NNN reference in Stories")
   fi
   if ! echo "$block" | grep -qE '(\*\*Files touched\*\*|^- \*\*Files touched\*\*)'; then
     errors+=("$tid: missing 'Files touched' field")
