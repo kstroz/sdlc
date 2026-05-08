@@ -4,9 +4,11 @@ Read all files under `pipeline/conventions/05-dev/` before starting.
 
 ## What to read as source material
 
-1. `.pipeline/02-spec/prd.md` — epics and user stories (required).
-2. `.pipeline/04-architecture/` — tech stack, data model, API contracts (required).
-3. `PRODUCT.md` — personas for acceptance criteria context.
+1. `.pipeline/02-spec/prd.md` — epics index and NFRs (required).
+2. `.pipeline/02-spec/stories/` — individual US-NNN story files (required).
+   Load only the story currently being implemented — not all stories at once.
+3. `.pipeline/04-architecture/` — tech stack, data model, API contracts (required).
+4. `PRODUCT.md` — personas for acceptance criteria context.
 
 If stage 02 or 04 artifacts are missing, tell the user to run the earlier stages first and stop.
 

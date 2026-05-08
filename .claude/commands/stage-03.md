@@ -5,10 +5,14 @@ before writing anything.
 
 ## What to read as source material
 
-1. `.pipeline/02-spec/prd.md` — epics, user stories, acceptance criteria (required).
-   If missing, run `/stage-02` first and stop.
-2. `PRODUCT.md` — personas for naming and context.
-3. `.pipeline/03-ux/_inputs/` — any wireframes, Figma exports, or UX notes if present.
+1. `.pipeline/02-spec/prd.md` — epics index and NFRs (required).
+2. `.pipeline/02-spec/stories/` — all US-NNN story files, acceptance criteria (required).
+   If either is missing, run `/stage-02` first and stop.
+3. `PRODUCT.md` — personas for naming and context.
+4. `.pipeline/03-ux/_inputs/` — Stitch exports, wireframes, or UX screenshots if present.
+   If Stitch exports exist, use them as visual reference for component names and layout intent.
+   They inform the artifacts but do not replace them — every screen still requires a formal
+   entry in screens.md. If no exports are present, derive screens from story acceptance criteria.
 
 ## What to produce
 

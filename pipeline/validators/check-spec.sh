@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# check-spec.sh — validate stage 02 prd.md against conventions/02-spec/prd-template.md
+# check-spec.sh — validate stage 02 artifacts against conventions/02-spec/
+#
+# Validates prd.md (feature brief) and all story files under stories/.
 #
 # Usage: ./check-spec.sh <path-to-02-spec-dir>
 # Exit 0 = pass, exit 1 = fail, exit 2 = bad invocation.
@@ -16,111 +18,149 @@ if [[ ! -d "$DIR" ]]; then
   exit 1
 fi
 
-FILE="$DIR/prd.md"
-if [[ ! -f "$FILE" ]]; then
-  echo "FAIL: missing required file: prd.md" >&2
-  exit 1
-fi
-
+PRD="$DIR/prd.md"
+STORIES_DIR="$DIR/stories"
 errors=()
 
-check() {
-  local label="$1"
-  local cmd="$2"
-  if ! eval "$cmd" >/dev/null 2>&1; then
-    errors+=("$label")
-  fi
-}
+# ── prd.md ────────────────────────────────────────────────────────────────────
 
-# 1. Frontmatter.
-check "frontmatter: missing opening ---"  "head -n1 \"$FILE\" | grep -qx -- '---'"
-check "frontmatter: missing 'id:'"        "awk '/^---$/{n++;next} n==1' \"$FILE\" | grep -qE '^id:'"
-check "frontmatter: missing 'jira:'"      "awk '/^---$/{n++;next} n==1' \"$FILE\" | grep -qE '^jira:'"
-check "frontmatter: missing 'created:'"   "awk '/^---$/{n++;next} n==1' \"$FILE\" | grep -qE '^created:'"
-check "frontmatter: missing 'version:'"   "awk '/^---$/{n++;next} n==1' \"$FILE\" | grep -qE '^version:'"
-
-# 2. Required top-level sections.
-check "missing section: ## Overview"                    "grep -qxF '## Overview' \"$FILE\""
-check "missing section: ## Epics"                       "grep -qxF '## Epics' \"$FILE\""
-check "missing section: ## Non-functional requirements" "grep -qxF '## Non-functional requirements' \"$FILE\""
-check "missing section: ## Out of scope"                "grep -qxF '## Out of scope' \"$FILE\""
-
-# 3. Overview must reference an idea ID.
-overview_block=$(awk '/^## Overview$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
-if ! echo "$overview_block" | grep -qE 'I-[0-9]+'; then
-  errors+=("overview: must link to idea ID matching I-[0-9]+")
-fi
-
-# 4. At least one epic heading.
-check "epics: no ### E-NN heading found" "grep -qE '^### E-[0-9]{2}' \"$FILE\""
-
-# 5. Each epic must contain at least one user story.
-epic_ids=$(grep -oE '^### E-[0-9]{2}' "$FILE" | awk '{print $2}')
-while IFS= read -r eid; do
-  [[ -z "$eid" ]] && continue
-  block=$(awk -v id="### $eid" '
-    $0 ~ "^"id"( |$)" {flag=1; next}
-    /^### E-/ {flag=0}
-    flag {print}
-  ' "$FILE")
-  if ! echo "$block" | grep -qE '^#### US-[0-9]{3}'; then
-    errors+=("epic $eid: contains no #### US-NNN story")
-  fi
-done <<< "$epic_ids"
-
-# 6. Each user story: statement, priority, acceptance criteria, source.
-story_ids=$(grep -oE '^#### US-[0-9]{3}' "$FILE" | awk '{print $2}')
-while IFS= read -r sid; do
-  [[ -z "$sid" ]] && continue
-  block=$(awk -v id="#### $sid" '
-    $0 ~ "^"id"( |$)" {flag=1; next}
-    /^#### / {flag=0}
-    flag {print}
-  ' "$FILE")
-
-  for phrase in "As a" "I want to" "so that"; do
-    if ! echo "$block" | grep -qiF "$phrase"; then
-      errors+=("story $sid: missing required phrase '$phrase' in statement")
+if [[ ! -f "$PRD" ]]; then
+  errors+=("missing required file: prd.md")
+else
+  check_prd() {
+    local label="$1" cmd="$2"
+    if ! eval "$cmd" >/dev/null 2>&1; then
+      errors+=("prd.md: $label")
     fi
-  done
+  }
 
-  if ! echo "$block" | grep -qE '\*\*Priority\*\*:\s*(MUST|SHOULD|COULD)'; then
-    errors+=("story $sid: missing or invalid Priority (must be MUST, SHOULD, or COULD)")
+  check_prd "frontmatter missing opening ---"  "head -n1 \"$PRD\" | grep -qx -- '---'"
+  check_prd "frontmatter missing 'id:'"        "awk '/^---$/{n++;next} n==1' \"$PRD\" | grep -qE '^id:'"
+  check_prd "frontmatter missing 'jira:'"      "awk '/^---$/{n++;next} n==1' \"$PRD\" | grep -qE '^jira:'"
+  check_prd "frontmatter missing 'created:'"   "awk '/^---$/{n++;next} n==1' \"$PRD\" | grep -qE '^created:'"
+  check_prd "frontmatter missing 'version:'"   "awk '/^---$/{n++;next} n==1' \"$PRD\" | grep -qE '^version:'"
+
+  check_prd "missing section: ## Overview"                    "grep -qxF '## Overview' \"$PRD\""
+  check_prd "missing section: ## Epics"                       "grep -qxF '## Epics' \"$PRD\""
+  check_prd "missing section: ## Non-functional requirements" "grep -qxF '## Non-functional requirements' \"$PRD\""
+  check_prd "missing section: ## Out of scope"                "grep -qxF '## Out of scope' \"$PRD\""
+
+  # Overview must link to an idea ID.
+  overview_block=$(awk '/^## Overview$/{flag=1;next} /^## /{flag=0} flag' "$PRD")
+  if ! echo "$overview_block" | grep -qE 'I-[0-9]+'; then
+    errors+=("prd.md: overview must link to idea ID matching I-[0-9]+")
   fi
 
-  ac_block=$(echo "$block" | awk '/\*\*Acceptance criteria\*\*/{flag=1; next} /^\*\*[A-Z]/{flag=0} flag')
-  if ! echo "$ac_block" | grep -qiE 'given.*when.*then|given'; then
-    errors+=("story $sid: acceptance criteria missing Given/when/then")
+  # Epics table: at least 1 data row.
+  epics_block=$(awk '/^## Epics$/{flag=1;next} /^## /{flag=0} flag' "$PRD")
+  epic_rows=$(echo "$epics_block" | grep -E '^\| E-[0-9]{2}' | wc -l | tr -d ' ')
+  if (( epic_rows < 1 )); then
+    errors+=("prd.md: epics table must have at least 1 E-NN row")
   fi
 
-  if ! echo "$block" | grep -qE '_inputs/.*\.md'; then
-    errors+=("story $sid: missing Source with _inputs/ reference")
-  fi
-done <<< "$story_ids"
+  # Every US-NNN referenced in epics table must have a story file.
+  story_ids_in_prd=$(echo "$epics_block" | grep -oE 'US-[0-9]{3}' | sort -u)
+  while IFS= read -r sid; do
+    [[ -z "$sid" ]] && continue
+    slug_file=$(find "$STORIES_DIR" -maxdepth 1 -name "${sid}-*.md" 2>/dev/null | head -1)
+    exact_file="$STORIES_DIR/${sid}.md"
+    if [[ -z "$slug_file" && ! -f "$exact_file" ]]; then
+      errors+=("prd.md: story $sid referenced in epics table has no file in stories/")
+    fi
+  done <<< "$story_ids_in_prd"
 
-# 7. NFR table: at least 3 data rows, each with a digit.
-nfr_block=$(awk '/^## Non-functional requirements$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
-nfr_rows=$(echo "$nfr_block" | grep -cE '^\|[^|]+\|[^|]+\|[^|]+\|' || true)
-if (( nfr_rows < 4 )); then  # header + separator + at least 3 data rows = 5 lines minimum, but be lenient
-  nfr_data_rows=$(echo "$nfr_block" | grep -E '^\|' | grep -v '^|[-| ]*|$' | grep -v 'ID.*Category' | grep -cE '[0-9]' || true)
-  if (( nfr_data_rows < 3 )); then
-    errors+=("non-functional requirements: need at least 3 rows with numeric targets, found $nfr_data_rows")
+  # NFR table: at least 3 data rows with numeric values.
+  nfr_block=$(awk '/^## Non-functional requirements$/{flag=1;next} /^## /{flag=0} flag' "$PRD")
+  nfr_data=$(echo "$nfr_block" | grep -E '^\|' | grep -v '^|[-| ]*|$' | grep -v 'ID.*Category' | grep -E '[0-9]' | wc -l | tr -d ' ')
+  if (( nfr_data < 3 )); then
+    errors+=("prd.md: non-functional requirements needs ≥ 3 rows with numeric targets, found $nfr_data")
+  fi
+
+  # Out of scope: at least 1 bullet.
+  oos_block=$(awk '/^## Out of scope$/{flag=1;next} /^## /{flag=0} flag' "$PRD")
+  if ! echo "$oos_block" | grep -qE '^- '; then
+    errors+=("prd.md: out of scope needs at least 1 bullet item")
   fi
 fi
 
-# 8. Out of scope: at least 1 bullet.
-oos_block=$(awk '/^## Out of scope$/{flag=1; next} /^## /{flag=0} flag' "$FILE")
-oos_bullets=$(echo "$oos_block" | grep -cE '^- ' || true)
-if (( oos_bullets < 1 )); then
-  errors+=("out of scope: need at least 1 bullet item")
+# ── stories/ ──────────────────────────────────────────────────────────────────
+
+if [[ ! -d "$STORIES_DIR" ]]; then
+  errors+=("missing required directory: stories/")
+else
+  story_files=$(find "$STORIES_DIR" -maxdepth 1 -name 'US-*.md' | sort)
+  story_count=$(echo "$story_files" | grep -c 'US-' || true)
+
+  if (( story_count < 1 )); then
+    errors+=("stories/: no US-NNN-*.md files found")
+  fi
+
+  while IFS= read -r sf; do
+    [[ -z "$sf" ]] && continue
+    base=$(basename "$sf")
+
+    check_story() {
+      local label="$1" cmd="$2"
+      if ! eval "$cmd" >/dev/null 2>&1; then
+        errors+=("$base: $label")
+      fi
+    }
+
+    check_story "frontmatter missing opening ---"  "head -n1 \"$sf\" | grep -qx -- '---'"
+    check_story "frontmatter missing 'id:'"        "awk '/^---$/{n++;next} n==1' \"$sf\" | grep -qE '^id:'"
+    check_story "frontmatter missing 'epic:'"      "awk '/^---$/{n++;next} n==1' \"$sf\" | grep -qE '^epic:'"
+    check_story "frontmatter missing 'priority:'"  "awk '/^---$/{n++;next} n==1' \"$sf\" | grep -qE '^priority:'"
+    check_story "frontmatter missing 'status:'"    "awk '/^---$/{n++;next} n==1' \"$sf\" | grep -qE '^status:'"
+
+    # priority must be MUST, SHOULD, or COULD.
+    priority=$(awk '/^---$/{n++;next} n==1 && /^priority:/' "$sf" | sed 's/priority: *//')
+    if [[ "$priority" != "MUST" && "$priority" != "SHOULD" && "$priority" != "COULD" ]]; then
+      errors+=("$base: priority must be MUST, SHOULD, or COULD — got '$priority'")
+    fi
+
+    # status must be todo, in-progress, or done.
+    status=$(awk '/^---$/{n++;next} n==1 && /^status:/' "$sf" | sed 's/status: *//')
+    if [[ "$status" != "todo" && "$status" != "in-progress" && "$status" != "done" ]]; then
+      errors+=("$base: status must be todo, in-progress, or done — got '$status'")
+    fi
+
+    # Statement section: required phrases.
+    stmt_block=$(awk '/^## Statement$/{flag=1;next} /^## /{flag=0} flag' "$sf")
+    for phrase in "As a" "I want to" "so that"; do
+      if ! echo "$stmt_block" | grep -qiF "$phrase"; then
+        errors+=("$base: statement missing required phrase '$phrase'")
+      fi
+    done
+
+    # Acceptance criteria: at least 1 Given/when/then bullet.
+    ac_block=$(awk '/^## Acceptance criteria$/{flag=1;next} /^## /{flag=0} flag' "$sf")
+    if ! echo "$ac_block" | grep -qiE 'given'; then
+      errors+=("$base: acceptance criteria missing 'Given' — use Given/when/then format")
+    fi
+
+    # Source: must reference _inputs/.
+    src_block=$(awk '/^## Source$/{flag=1;next} /^## /{flag=0} flag' "$sf")
+    if ! echo "$src_block" | grep -qE '_inputs/'; then
+      errors+=("$base: source section missing _inputs/ reference")
+    fi
+
+    # epic field must reference an E-NN that exists in prd.md.
+    epic_val=$(awk '/^---$/{n++;next} n==1 && /^epic:/' "$sf" | sed 's/epic: *//')
+    if [[ -f "$PRD" ]] && ! grep -qF "$epic_val" "$PRD"; then
+      errors+=("$base: epic '$epic_val' not found in prd.md epics table")
+    fi
+
+  done <<< "$story_files"
 fi
+
+# ── result ────────────────────────────────────────────────────────────────────
 
 if (( ${#errors[@]} == 0 )); then
-  echo "PASS: $FILE conforms to prd-template.md"
+  echo "PASS: $DIR conforms to stage 02 conventions"
   exit 0
 fi
 
-echo "FAIL: $FILE has ${#errors[@]} issue(s):"
+echo "FAIL: $DIR has ${#errors[@]} issue(s):"
 for e in "${errors[@]}"; do
   echo "  - $e"
 done

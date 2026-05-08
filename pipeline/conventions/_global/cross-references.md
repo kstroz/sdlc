@@ -7,8 +7,8 @@ Defines how artifacts link to each other across stages. Validators and downstrea
 - **ID prefixes** are fixed across all artifacts:
   - `I-NN` — ideas (stage 01), in `.pipeline/01-idea/idea.md`
   - `P-NN` — personas (product-level), in `PRODUCT.md` at repo root
-  - `E-NN` — epics (stage 02), in `.pipeline/02-spec/prd.md`
-  - `US-NNN` — user stories (stage 02), in `.pipeline/02-spec/prd.md`
+  - `E-NN` — epics (stage 02), in `.pipeline/02-spec/prd.md` epics table
+  - `US-NNN` — user stories (stage 02), one file each in `.pipeline/02-spec/stories/`
   - `NFR-NN` — non-functional requirements (stage 02), in `.pipeline/02-spec/prd.md` NFR table
   - `S-NN` — screens (stage 03), in `.pipeline/03-ux/screens.md`
   - `ADR-NNN` — architecture decisions (stage 04), in `.pipeline/04-architecture/adr/`
